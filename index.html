@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ummah Connect - UI Prototype</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="device-frame">
+        <div class="screen-container">
+            
+            <!-- Screen 1: Splash -->
+            <div id="screen-splash" class="screen active splash-bg">
+                <div class="splash-content">
+                    <i class="fa-solid fa-mosque splash-logo"></i>
+                    <h1 class="splash-title">Ummah Connect</h1>
+                    <p class="splash-tagline">Your everyday Muslim companion.</p>
+                </div>
+            </div>
+
+            <!-- Screen 2: Onboarding -->
+            <div id="screen-onboarding" class="screen bg-ivory">
+                <div class="onboarding-content">
+                    <div class="illustration-placeholder">
+                        <i class="fa-solid fa-hands-praying" style="font-size: 64px; color: var(--emerald);"></i>
+                    </div>
+                    <h2>Welcome</h2>
+                    <p class="subtitle">Choose your language / ভাষা নির্বাচন করুন</p>
+                    
+                    <div class="lang-selector">
+                        <button class="btn btn-outline active">English</button>
+                        <button class="btn btn-outline" style="font-family: 'Noto Sans Bengali', sans-serif;">বাংলা</button>
+                    </div>
+                    
+                    <div class="location-card mt-20">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <div>
+                            <h4>Location Access</h4>
+                            <p>Required for prayer times & Qibla</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bottom-actions">
+                        <button class="btn btn-primary w-100" onclick="navTo('screen-home')">Continue as Guest</button>
+                        <button class="btn btn-text w-100 mt-10">Register / Login</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 3: Home Dashboard -->
+            <div id="screen-home" class="screen bg-ivory has-bottom-nav">
+                <div class="header">
+                    <div>
+                        <p class="greeting">Assalamu Alaikum, Guest</p>
+                        <p class="location"><i class="fa-solid fa-location-dot"></i> Dhaka, Bangladesh</p>
+                    </div>
+                    <i class="fa-regular fa-bell icon-btn"></i>
+                </div>
+                
+                <div class="content-scroll">
+                    <!-- Date & Countdown -->
+                    <div class="date-row">
+                        <p>14 Rajab 1445 AH</p>
+                        <p>Sun, 8 Nov 2026</p>
+                    </div>
+                    
+                    <div class="next-prayer-card" onclick="navTo('screen-prayer')">
+                        <h3>Next: Asr</h3>
+                        <h1 class="countdown">01:45:20</h1>
+                        <p>Starts at 3:45 PM</p>
+                    </div>
+
+                    <!-- Prayer Times Row -->
+                    <div class="prayers-row">
+                        <div class="prayer-col"><span>Fajr</span><span>5:02</span></div>
+                        <div class="prayer-col"><span>Dhuhr</span><span>11:58</span></div>
+                        <div class="prayer-col active"><span>Asr</span><span>3:45</span></div>
+                        <div class="prayer-col"><span>Maghrib</span><span>5:22</span></div>
+                        <div class="prayer-col"><span>Isha</span><span>6:45</span></div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <div class="action-btn" onclick="navTo('screen-qibla')">
+                            <div class="icon-circle"><i class="fa-regular fa-compass"></i></div>
+                            <span>Qibla</span>
+                        </div>
+                        <div class="action-btn" onclick="navTo('screen-mosques')">
+                            <div class="icon-circle"><i class="fa-solid fa-mosque"></i></div>
+                            <span>Mosques</span>
+                        </div>
+                        <div class="action-btn" onclick="navTo('screen-bazaar')">
+                            <div class="icon-circle"><i class="fa-solid fa-store"></i></div>
+                            <span>Halal</span>
+                        </div>
+                        <div class="action-btn" onclick="navTo('screen-content')">
+                            <div class="icon-circle"><i class="fa-solid fa-book-open"></i></div>
+                            <span>Daily</span>
+                        </div>
+                    </div>
+
+                    <!-- Nearby Mosque -->
+                    <h3 class="section-title">Nearby Jamaat</h3>
+                    <div class="card mosque-card" onclick="navTo('screen-mosque-detail')">
+                        <div class="card-info">
+                            <h4>Baitul Mukarram National Mosque</h4>
+                            <p>Asr Jamaat: 4:15 PM • 1.2 km</p>
+                        </div>
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+
+                    <!-- Daily Reminder -->
+                    <h3 class="section-title">Daily Reminder</h3>
+                    <div class="card quote-card">
+                        <p>"Indeed, with hardship [will be] ease."</p>
+                        <p class="ref">Quran 94:6</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 4: Prayer Times -->
+            <div id="screen-prayer" class="screen bg-ivory has-bottom-nav">
+                <div class="top-nav">
+                    <i class="fa-solid fa-arrow-left" onclick="navTo('screen-home')"></i>
+                    <h2>Prayer Times</h2>
+                    <i class="fa-solid fa-gear"></i>
+                </div>
+                <div class="content-scroll">
+                    <div class="list-card mt-20">
+                        <div class="list-item"><span>Fajr</span><span>5:02 AM</span></div>
+                        <div class="list-item"><span>Sunrise</span><span>6:18 AM</span></div>
+                        <div class="list-item"><span>Dhuhr</span><span>11:58 AM</span></div>
+                        <div class="list-item active-list-item">
+                            <span>Asr (Next)</span>
+                            <div><span class="mr-10">3:45 PM</span><i class="fa-solid fa-bell"></i></div>
+                        </div>
+                        <div class="list-item"><span>Maghrib</span><span>5:22 PM</span></div>
+                        <div class="list-item"><span>Isha</span><span>6:45 PM</span></div>
+                    </div>
+                    <button class="btn btn-outline w-100 mt-20">Weekly Timetable</button>
+                    <p class="small-text text-center mt-10">Calc Method: Islamic Foundation Bangladesh</p>
+                </div>
+            </div>
+
+            <!-- Screen 5: Qibla Compass -->
+            <div id="screen-qibla" class="screen bg-ivory has-bottom-nav">
+                <div class="top-nav">
+                    <i class="fa-solid fa-arrow-left" onclick="navTo('screen-home')"></i>
+                    <h2>Qibla Direction</h2>
+                    <div></div>
+                </div>
+                <div class="content-scroll flex-center">
+                    <p class="text-center mb-20">Dhaka, Bangladesh<br>Distance to Kaaba: 4,520 km</p>
+                    <div class="compass-container">
+                        <div class="compass-ring">
+                            <div class="qibla-pointer"><i class="fa-solid fa-location-arrow"></i></div>
+                        </div>
+                    </div>
+                    <p class="text-center mt-30 small-text">Move phone in a figure 8 to calibrate.</p>
+                </div>
+            </div>
+
+            <!-- Screen 6: Discover Mosques -->
+            <div id="screen-mosques" class="screen bg-ivory has-bottom-nav">
+                <div class="top-nav">
+                    <h2>Discover Mosques</h2>
+                    <div class="toggle-btn"><i class="fa-solid fa-map"></i></div>
+                </div>
+                <div class="content-scroll">
+                    <div class="search-bar">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" placeholder="Search mosques nearby...">
+                    </div>
+                    
+                    <div class="card mt-20" onclick="navTo('screen-mosque-detail')">
+                        <h4>Baitul Mukarram National Mosque</h4>
+                        <p class="text-secondary small-text">Paltan, Dhaka • 1.2 km</p>
+                        <div class="tags mt-10">
+                            <span class="tag">Jumu'ah 1:30 PM</span>
+                            <span class="tag">Women's Section</span>
+                        </div>
+                    </div>
+
+                    <div class="card mt-10">
+                        <h4>Gulshan Society Mosque</h4>
+                        <p class="text-secondary small-text">Gulshan 2, Dhaka • 4.5 km</p>
+                        <div class="tags mt-10">
+                            <span class="tag">Jumu'ah 1:15 PM</span>
+                            <span class="tag">AC</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 7: Mosque Details -->
+            <div id="screen-mosque-detail" class="screen bg-ivory has-bottom-nav">
+                 <div class="cover-img mosque-cover">
+                    <div class="back-btn-overlay" onclick="navTo('screen-mosques')"><i class="fa-solid fa-arrow-left"></i></div>
+                 </div>
+                 <div class="content-scroll overlap-content">
+                     <div class="card header-card">
+                         <h2>Baitul Mukarram</h2>
+                         <p class="text-secondary">Paltan, Dhaka • 1.2 km</p>
+                         <div class="action-buttons mt-10">
+                             <button class="btn btn-primary"><i class="fa-solid fa-directions"></i> Get Directions</button>
+                         </div>
+                     </div>
+                     
+                     <h3 class="section-title">Today's Jamaat</h3>
+                     <div class="list-card">
+                        <div class="list-item"><span>Fajr</span><span>5:30 AM</span></div>
+                        <div class="list-item"><span>Dhuhr</span><span>1:00 PM</span></div>
+                        <div class="list-item"><span>Asr</span><span>4:15 PM</span></div>
+                        <div class="list-item"><span>Maghrib</span><span>5:30 PM</span></div>
+                        <div class="list-item"><span>Isha</span><span>7:15 PM</span></div>
+                    </div>
+                 </div>
+            </div>
+
+            <!-- Screen 8: Halal Bazaar -->
+            <div id="screen-bazaar" class="screen bg-ivory has-bottom-nav">
+                <div class="top-nav">
+                    <h2>Halal Bazaar</h2>
+                    <i class="fa-solid fa-filter"></i>
+                </div>
+                <div class="content-scroll">
+                    <div class="search-bar">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" placeholder="Search food, books, clothes...">
+                    </div>
+                    
+                    <div class="category-grid mt-20">
+                        <div class="cat-item"><div class="cat-icon"><i class="fa-solid fa-utensils"></i></div><span>Restaurants</span></div>
+                        <div class="cat-item"><div class="cat-icon"><i class="fa-solid fa-drumstick-bite"></i></div><span>Meat</span></div>
+                        <div class="cat-item"><div class="cat-icon"><i class="fa-solid fa-shirt"></i></div><span>Clothing</span></div>
+                        <div class="cat-item"><div class="cat-icon"><i class="fa-solid fa-book"></i></div><span>Books</span></div>
+                    </div>
+
+                    <h3 class="section-title">Featured Spots in Dhaka</h3>
+                    <div class="card bazaar-card" onclick="navTo('screen-biz-detail')">
+                        <div class="bazaar-img"></div>
+                        <div class="bazaar-info">
+                            <h4>Star Kabab & Restaurant</h4>
+                            <p class="text-secondary small-text">Dhanmondi • 2.3 km</p>
+                            <span class="tag mt-5"><i class="fa-solid fa-check-circle" style="color:var(--emerald);"></i> Muslim Owned</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 9: Business Detail -->
+            <div id="screen-biz-detail" class="screen bg-ivory has-bottom-nav">
+                <div class="cover-img biz-cover">
+                    <div class="back-btn-overlay" onclick="navTo('screen-bazaar')"><i class="fa-solid fa-arrow-left"></i></div>
+                </div>
+                <div class="content-scroll overlap-content">
+                    <div class="card header-card">
+                         <h2>Star Kabab & Restaurant</h2>
+                         <p class="text-secondary">Dhanmondi, Dhaka • 2.3 km</p>
+                         <div class="halal-status mt-10">
+                             <i class="fa-solid fa-shield-halal" style="color:var(--emerald); font-size:24px;"></i>
+                             <div>
+                                 <strong>Halal Verified</strong>
+                                 <p class="small-text">Muslim owned, local sourced meat.</p>
+                             </div>
+                         </div>
+                         <div class="action-buttons mt-10">
+                             <button class="btn btn-outline" style="flex:1;"><i class="fa-solid fa-phone"></i> Call</button>
+                             <button class="btn btn-primary" style="flex:1;"><i class="fa-solid fa-directions"></i> Map</button>
+                         </div>
+                     </div>
+                </div>
+            </div>
+
+            <!-- Screen 10: Daily Content -->
+            <div id="screen-content" class="screen bg-ivory has-bottom-nav">
+                <div class="top-nav">
+                    <h2>Daily Inspiration</h2>
+                    <i class="fa-regular fa-bookmark"></i>
+                </div>
+                <div class="content-scroll">
+                    <div class="card quran-card text-center">
+                        <p class="small-text text-secondary">Verse of the Day</p>
+                        <h2 class="arabic mt-10">فَإِنَّ مَعَ الْعُسْرِ يُسْرًا</h2>
+                        <p class="english mt-10">"For indeed, with hardship [will be] ease."</p>
+                        <p class="bangla mt-10">"নিশ্চয়ই কষ্টের সাথেই রয়েছে স্বস্তি।"</p>
+                        <p class="ref mt-10">Surah Ash-Sharh [94:5]</p>
+                        <div class="share-row mt-10">
+                            <i class="fa-regular fa-heart"></i>
+                            <i class="fa-solid fa-share-nodes"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="card hadith-card mt-20">
+                        <p class="small-text text-secondary mb-10">Hadith of the Day</p>
+                        <p>"The most beloved of deeds to Allah are those that are most consistent, even if it is small."</p>
+                        <p class="ref mt-10">Sahih al-Bukhari 6464</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Screen 11: Profile -->
+            <div id="screen-profile" class="screen bg-ivory has-bottom-nav">
+                <div class="top-nav">
+                    <h2>Profile</h2>
+                </div>
+                <div class="content-scroll">
+                    <div class="profile-header text-center mt-20">
+                        <div class="avatar"><i class="fa-regular fa-user"></i></div>
+                        <h3 class="mt-10">Guest User</h3>
+                        <button class="btn btn-outline btn-sm mt-10">Sign In / Register</button>
+                    </div>
+
+                    <div class="settings-list mt-30">
+                        <div class="setting-item">
+                            <div><i class="fa-solid fa-language mr-10"></i> Language</div>
+                            <span class="text-secondary">English <i class="fa-solid fa-chevron-right ml-10"></i></span>
+                        </div>
+                        <div class="setting-item">
+                            <div><i class="fa-solid fa-location-dot mr-10"></i> Location</div>
+                            <span class="text-secondary">Dhaka <i class="fa-solid fa-chevron-right ml-10"></i></span>
+                        </div>
+                        <div class="setting-item">
+                            <div><i class="fa-solid fa-bell mr-10"></i> Notifications</div>
+                            <i class="fa-solid fa-chevron-right text-secondary"></i>
+                        </div>
+                        <div class="setting-item">
+                            <div><i class="fa-solid fa-gear mr-10"></i> Prayer Calculation</div>
+                            <i class="fa-solid fa-chevron-right text-secondary"></i>
+                        </div>
+                    </div>
+                    
+                    <p class="small-text text-center text-secondary mt-30">Ummah Connect v1.0.0<br>Made with <i class="fa-solid fa-heart" style="color:var(--gold)"></i> for Bangladesh</p>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="navTo('screen-home', this)">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Home</span>
+                </div>
+                <div class="nav-item" onclick="navTo('screen-mosques', this)">
+                    <i class="fa-solid fa-mosque"></i>
+                    <span>Discover</span>
+                </div>
+                <div class="nav-item" onclick="navTo('screen-bazaar', this)">
+                    <i class="fa-solid fa-store"></i>
+                    <span>Bazaar</span>
+                </div>
+                <div class="nav-item" onclick="navTo('screen-content', this)">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>Daily</span>
+                </div>
+                <div class="nav-item" onclick="navTo('screen-profile', this)">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Profile</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
