@@ -1,74 +1,69 @@
-# Ummah Connect — Updated Product Direction and UX Rationale
+# Muslim Ummah — Technical Documentation & Design Decisions
 
-This prototype has been evolved from a general mobile Islamic app concept into a Bangla-first everyday Muslim companion designed for Bangladeshi users. The structure remains lightweight and static, but the user journey now prioritizes worship, Islamic routines, reminders, and daily practice over commercial discovery.
+This document outlines the architecture, UX decisions, API integration workflows, and state management implemented for the **Muslim Ummah** application.
 
-## Updated Product Direction
+---
 
-1. **Daily worship and routine first**
-   - The primary experience centers on prayer timing, next prayer countdown, daily adhkar, Sunnah practices, and useful Islamic reminders.
-   - The home screen is intentionally focused on worship and planning rather than marketplace browsing.
+## 1. Architectural Overview
 
-2. **Bangla-first experience**
-   - Bangla is the default interface language throughout the prototype.
-   - English remains available through profile and language toggle controls as a secondary option.
-   - Navigation labels, quick actions, and settings follow a consistent Bangla-first language pattern.
+The application is structured as a client-side Single Page Application (SPA) written in standard **JavaScript (ES6+)**, **HTML5**, and **CSS3**, completely free of heavy framework bloat.
 
-3. **Islamic lifestyle modules**
-   - Nafl prayer learning and planning is now a dedicated central screen.
-   - Adhkar and dua workflows are designed to support habit-building.
-   - Islamic calendar and special days are surfaced as part of a regular lifestyle loop.
-   - Fasting and Ramadan utilities are presented as helpful planning tools rather than as premium extras.
+### Architecture Components
 
-4. **Bazaar moved to secondary access**
-   - Halal Bazaar remains available in the prototype, but it is no longer treated as a primary entry point in the bottom navigation.
-   - It is kept under an additional “আরও” section to preserve the earlier flow while aligning with the updated product direction.
+1. **Configuration Layer (`.env` and `config.js`)**:
+   - `config.js` sets the baseline default configuration window object (`window.APP_CONFIG`).
+   - If running via an HTTP server, `config.js` asynchronously fetches `.env` using standard `fetch()`, parses `KEY=VALUE` pairs, overrides coordinates, radius, and endpoints, and fires an `env-loaded` event to re-query external APIs.
+   - When opened via `file://`, graceful fallback values ensure 100% operational integrity without errors.
 
-## Design Decisions
+2. **Core Real-Time Engine (`script.js`)**:
+   - **Live Clock Loop**: An interval tick (`setInterval`, 1000ms) drives the live digital clock (`HH:MM:SS`), computes the remaining seconds until the upcoming prayer, and checks alarm triggers against the current minute.
+   - **Aladhan API Integration**: Performs an asynchronous `fetch()` to `https://api.aladhan.com/v1/timings` specifying latitude, longitude, and calculation method.
+   - **Local Storage State Persistence**: User alarm preferences and custom alert timings are serialized into `localStorage` (`muslim_ummah_alarms`).
 
-1. **Color System**
-   - Emerald remains the primary brand color for actions, top-level worship emphasis, and status elements.
-   - Gold is retained for premium highlights and cues that signal value without creating visual overload.
-   - Ivory continues to support comfortable readability and a soft Islamic editorial feel.
+3. **Mosque Discovery & Jamat (Zamat) Calculation**:
+   - Coordinates: Base position `23°41'37.1"N 90°27'01.2"E` (`lat: 23.693639, lng: 90.450333`).
+   - Radius: Defined as `MOSQUE_SEARCH_RADIUS_KM=1.0` in `.env`.
+   - Haversine distance formula calculates the distance between base coordinates and discovered mosques.
+   - **Next Jamat Computation**: Calculates next congregational prayer based on prayer start times and standard Sunnah offsets (Fajr +38 min, Dhuhr 1:15 PM, Asr +25 min, Maghrib +10 min, Isha 7:45 PM, Jumu'ah 1:30 PM).
 
-2. **Typography**
-   - Inter remains the default English typeface for clarity and consistency.
-   - Noto Sans Bengali is used to support natural Bangla reading for core labels, cards, and navigation.
+---
 
-3. **Layout Strategy**
-   - Bottom navigation is simplified to five main sections: Home, Ibadat, Mosque, Calendar, and Profile.
-   - The home dashboard focuses on a single next-prayer card, prayer schedule, and a few high-value worship shortcuts.
-   - Content is organized into cards with generous spacing to preserve readability and reduce cognitive load.
+## 2. Key Design & Technical Decisions
 
-4. **Dhaka and Bangladesh context**
-   - Sample location is Dhaka.
-   - Prototype content uses Bangladesh-relevant dates, mosque references, and practice examples.
-   - Local context remains present without pretending that the app is connected to live data or a production backend.
+### 2.1 Rebranding & "মুসাফির" (Musafir) Concept
+- In Islamic tradition, "Musafir" (traveler / guest of the world) carries deep spiritual meaning. All references to generic "Guest" or "অতিথি" have been replaced with **মুসাফির**.
+- Brand name updated to **Muslim Ummah**.
 
-5. **Religious content integrity**
-   - Sample content is presented as illustrative or prototype-based and marked where discussion may vary by jurisprudential method or local practice.
-   - Disputed or variable rulings are not presented as universally established fact.
-   - This avoids overstating religious practices in a UI-only prototype.
+### 2.2 Alarm Feature Implementation
+- Added an alarm summary banner directly under the daily prayer list on the home screen and a quick config modal on the prayer details screen.
+- Used the **Web Audio API** (`AudioContext` oscillator and exponential gain ramps) to synthesize gentle melodic chime frequencies (A4, C#5, E5, A5), eliminating external audio file load failures or CORS issues.
+- Interactive modal supports enabling/disabling individual prayers (Fajr, Dhuhr, Asr, Maghrib, Isha) and configuring custom alarm times via `<input type="time">`.
 
-## Current Prototype Scope
+### 2.3 Font Awesome 6.5.1 & Visual Icon Polish
+- Upgraded to Font Awesome 6.5.1 CDN.
+- Replaced missing or deprecated icons:
+  - Sparkles replaced with `fa-wand-magic-sparkles`.
+  - Added dedicated prayer icons (`fa-cloud-sun`, `fa-sun`, `fa-cloud`, `fa-mountain-sun`, `fa-moon`).
+  - Added navigation icons and crosshair badges (`fa-location-crosshairs`, `fa-diamond-turn-right`).
 
-The prototype now demonstrates:
-- Bangla-first onboarding and navigation
-- Prayer dashboard and recurring worship flows
-- Nafl prayer module
-- Adhkar and dua library UI
-- Islamic calendar and special days
-- Prayer reminder controls
-- Restricted prayer time overview
-- Ramadan and fasting utilities
-- Sunnah fasting screen
-- Secondary Bazaar access under the “আরও” section
+---
 
-## How to View
+## 3. Environment Variables Reference
 
-1. Open the project folder in a browser environment.
-2. Launch the static page from [index.html](index.html) or serve it locally with a simple web server.
-3. Navigate through the mobile UI to test links, screens, and language switching.
+| Variable | Type | Default Value | Description |
+| :--- | :--- | :--- | :--- |
+| `BASE_LAT` | Float | `23.693639` | Latitude for 23°41'37.1"N |
+| `BASE_LNG` | Float | `90.450333` | Longitude for 90°27'01.2"E |
+| `BASE_LOCATION_NAME` | String | `যাত্রাবাড়ী/দনিয়া, ঢাকা` | Display name for base coordinate |
+| `MOSQUE_SEARCH_RADIUS_KM`| Float | `1.0` | Search radius in kilometers |
+| `PRAYER_CALC_METHOD` | Int | `1` | 1 = Univ. of Islamic Sciences Karachi (IFB compatible) |
+| `PRAYER_API_BASE_URL` | String | `https://api.aladhan.com/v1` | Free public Aladhan API endpoint |
+| `OSM_NOMINATIM_API_URL` | String | `https://nominatim.openstreetmap.org/search` | OpenStreetMap search endpoint |
 
-## Prototype Constraint
+---
 
-This is still a static front-end prototype. It simulates app behavior, mock content, and visual interaction only; it does not connect to a backend, real Islamic API, notification daemon, or actual live recurring alarm system.
+## 4. Verification and Testing
+
+1. **JavaScript Syntax Verification**: Verified with `node -c config.js` and `node -c script.js` (0 syntax errors).
+2. **Clock & Timer Precision**: Real-time ticker validated with 1-second cadence.
+3. **API Fallback Grace**: Tested behavior when offline or disconnected; system falls back to standard vetted local mosques and Karachi computation without breaking UI rendering.

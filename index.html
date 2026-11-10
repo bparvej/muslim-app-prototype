@@ -7,23 +7,37 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <title>Ummah Connect</title>
+    <title>Muslim Ummah</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="device-frame">
         <div class="screen-container">
 
+            <!-- Active Alarm Alert Banner (Popup) -->
+            <div id="alarm-banner" class="alarm-banner-alert" style="display: none;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <i class="fa-solid fa-bell fa-shake" style="font-size:20px; color:var(--gold);"></i>
+                    <div>
+                        <strong id="alarm-banner-title">নামাজের অ্যালার্ম!</strong>
+                        <p id="alarm-banner-sub" style="font-size:12px; margin:0; color:#fff;">ওয়াক্ত উপস্থিত হয়েছে</p>
+                    </div>
+                </div>
+                <button class="btn btn-sm" onclick="dismissAlarm()" style="background:var(--gold); color:var(--text-pri); border-radius:10px; padding:4px 10px;">বন্ধ করুন</button>
+            </div>
+
+            <!-- Splash Screen -->
             <div id="screen-splash" class="screen active splash-bg">
                 <div class="splash-content">
                     <i class="fa-solid fa-mosque splash-logo"></i>
-                    <h1 class="splash-title">Ummah Connect</h1>
+                    <h1 class="splash-title">Muslim Ummah</h1>
                     <p class="splash-tagline" data-i18n="tagline">আপনার দৈনন্দিন মুসলিম সঙ্গী</p>
                 </div>
             </div>
 
+            <!-- Onboarding Screen -->
             <div id="screen-onboarding" class="screen bg-ivory">
                 <div class="onboarding-content">
                     <div class="illustration-placeholder">
@@ -33,8 +47,8 @@
                     <p class="subtitle" data-i18n="selectLanguage">ভাষা নির্বাচন করুন / Choose your language</p>
 
                     <div class="lang-selector">
-                        <button class="btn btn-outline active" data-lang="en">English</button>
-                        <button class="btn btn-outline" data-lang="bn">বাংলা</button>
+                        <button class="btn btn-outline" data-lang="en">English</button>
+                        <button class="btn btn-outline active" data-lang="bn">বাংলা</button>
                     </div>
 
                     <div class="location-card mt-20">
@@ -46,48 +60,65 @@
                     </div>
 
                     <div class="bottom-actions">
-                        <button class="btn btn-primary w-100" onclick="navTo('screen-home')" data-i18n="continueGuest">অতিথি হিসেবে চালিয়ে যান</button>
+                        <button class="btn btn-primary w-100" onclick="navTo('screen-home')" data-i18n="continueMusafir">মুসাফির হিসেবে চালিয়ে যান</button>
                         <button class="btn btn-text w-100 mt-10" data-i18n="registerLogin">নিবন্ধন / লগইন</button>
                     </div>
                 </div>
             </div>
 
+            <!-- Home Screen -->
             <div id="screen-home" class="screen bg-ivory has-bottom-nav">
                 <div class="header">
                     <div>
-                        <p class="greeting" data-i18n="assalamuAlaikum">আসসালামু আলাইকুম, অতিথি</p>
-                        <p class="location"><i class="fa-solid fa-location-dot"></i> ঢাকা, বাংলাদেশ</p>
+                        <p class="greeting" data-i18n="assalamuAlaikum">আসসালামু আলাইকুম, মুসাফির</p>
+                        <p class="location" id="home-location"><i class="fa-solid fa-location-dot"></i> যাত্রাবাড়ী/দনিয়া, ঢাকা</p>
                     </div>
-                    <i class="fa-regular fa-bell icon-btn"></i>
+                    <i class="fa-regular fa-bell icon-btn" onclick="openAlarmModal()" title="অ্যালার্ম সেটিংস"></i>
                 </div>
 
                 <div class="content-scroll">
                     <div class="date-row">
-                        <p>১৪ রজব ১৪৪৫ হিজরি</p>
-                        <p>রবিবার, ০৮ নভেম্বর ২০২৬</p>
+                        <p id="hijri-date-text">হিজরি ক্যালেন্ডার...</p>
+                        <p id="gregorian-date-text">তারিখ লোড হচ্ছে...</p>
                     </div>
 
-                    <div class="next-prayer-card" onclick="navTo('screen-prayer')">
-                        <h3 data-i18n="nextPrayerLabel">পরবর্তী নামায</h3>
-                        <h1 class="countdown">01:45:20</h1>
-                        <p data-i18n="nextPrayerTime">আসর শুরু: ৩:৪৫ PM</p>
+                    <!-- Prayer Card with Real-time Waqt / Makruh Status & Countdown -->
+                    <div class="next-prayer-card" id="home-prayer-card" onclick="navTo('screen-prayer')">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span class="status-pill-badge" id="prayer-status-pill"><i class="fa-solid fa-circle-check"></i> ওয়াক্ত চলমান</span>
+                            <span class="source-tag" id="prayer-source-badge">রিয়েল-টাইম</span>
+                        </div>
+                        <h3 id="home-current-prayer-status">যোহর ওয়াক্ত চলমান</h3>
+                        <h1 class="countdown" id="prayer-countdown">00:00:00</h1>
+                        <p id="home-next-prayer-time" data-i18n="nextPrayerTime">ওয়াক্তের সময় লোড হচ্ছে...</p>
                     </div>
 
-                    <div class="prayers-row">
-                        <div class="prayer-col"><span>ফজর</span><span>৫:০২</span></div>
-                        <div class="prayer-col"><span>যোহর</span><span>১১:৫৮</span></div>
-                        <div class="prayer-col active"><span>আসর</span><span>৩:৪৫</span></div>
-                        <div class="prayer-col"><span>মাগরিব</span><span>৫:২২</span></div>
-                        <div class="prayer-col"><span>ইশা</span><span>৬:৪৫</span></div>
+                    <!-- 5 Daily Prayers Row -->
+                    <div class="prayers-row" id="home-prayers-row">
+                        <div class="prayer-col" data-prayer="Fajr"><span>ফজর</span><span class="p-time">--:--</span></div>
+                        <div class="prayer-col" data-prayer="Dhuhr"><span>যোহর</span><span class="p-time">--:--</span></div>
+                        <div class="prayer-col" data-prayer="Asr"><span>আসর</span><span class="p-time">--:--</span></div>
+                        <div class="prayer-col" data-prayer="Maghrib"><span>মাগরিব</span><span class="p-time">--:--</span></div>
+                        <div class="prayer-col" data-prayer="Isha"><span>ইশা</span><span class="p-time">--:--</span></div>
                     </div>
 
+                    <!-- Alarm Option Under Namaz Timing -->
+                    <div class="alarm-summary-banner mt-10" onclick="openAlarmModal()">
+                        <div>
+                            <h4><i class="fa-solid fa-bell" style="color:var(--emerald);"></i> <span data-i18n="prayerAlarmTitle">নামাজের অ্যালার্ম</span></h4>
+                            <p class="small-text text-secondary" id="alarm-summary-text">ওয়াক্তের অ্যালার্ম চালু আছে</p>
+                        </div>
+                        <button class="btn btn-outline btn-sm" style="border-radius:10px; padding:6px 12px;" data-i18n="configureAlarm">সেট করুন</button>
+                    </div>
+
+                    <!-- Quick Actions -->
                     <div class="quick-actions">
                         <div class="action-btn" onclick="navTo('screen-nafl')">
                             <div class="icon-circle"><i class="fa-solid fa-person-praying"></i></div>
                             <span data-i18n="naflPrayer">নফল নামায</span>
                         </div>
                         <div class="action-btn" onclick="navTo('screen-adhkar')">
-                            <div class="icon-circle"><i class="fa-solid fa-sparkles"></i></div>
+                            <div class="icon-circle"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
                             <span data-i18n="adhkar">আমল</span>
                         </div>
                         <div class="action-btn" onclick="navTo('screen-dua')">
@@ -114,227 +145,307 @@
                         </div>
                     </div>
 
-                    <h3 class="section-title" data-i18n="nearbyMosque">কাছের মসজিদ</h3>
-                    <div class="card mosque-card" onclick="navTo('screen-mosque-detail')">
+                    <!-- Nearby Mosque Preview with Radius & Real Zamat -->
+                    <div style="display:flex; justify-content:space-between; align-items:center;" class="mt-10">
+                        <h3 class="section-title" style="margin:0;" data-i18n="nearbyMosque">কাছের মসজিদ</h3>
+                        <span class="radius-badge" id="home-radius-badge"><i class="fa-solid fa-bullseye"></i> <span id="home-radius-text">১ কিমি ব্যাসার্ধ</span></span>
+                    </div>
+                    <div class="card mosque-card mt-10" id="home-mosque-preview" onclick="navTo('screen-mosques')">
+                        <img id="home-mosque-img" src="" alt="Mosque" class="mosque-thumbnail" style="display:none;">
                         <div class="card-info">
-                            <h4>বায়তুল মোকাররম জাতীয় মসজিদ</h4>
-                            <p>আসর জামাত: ৪:১৫ PM • ১.২ কিমি</p>
+                            <h4 id="home-mosque-name">কাছের মসজিদ খোঁজা হচ্ছে...</h4>
+                            <p id="home-mosque-sub">লোড হচ্ছে • জামাতের সময়সূচী</p>
                         </div>
                         <i class="fa-solid fa-chevron-right"></i>
                     </div>
 
                     <h3 class="section-title" data-i18n="sehriIftar">সেহরি / ইফতার</h3>
                     <div class="card info-card">
-                        <div class="info-row"><span>সেহরির শেষ</span><strong>৪:১৭ AM</strong></div>
-                        <div class="info-row"><span>ইফতার</span><strong>৫:২৩ PM</strong></div>
+                        <div class="info-row"><span>সেহরির শেষ (ইমসাক)</span><strong id="time-imsak">--:-- AM</strong></div>
+                        <div class="info-row"><span>ইফতার (মাগরিব)</span><strong id="time-iftar">--:-- PM</strong></div>
                     </div>
                 </div>
             </div>
 
+            <!-- Ibadat Screen -->
             <div id="screen-ibadat" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-home')"></i>
                     <h2 data-i18n="ibadat">ইবাদত</h2>
-                    <div></div>
+                    <i class="fa-solid fa-bell" onclick="openAlarmModal()" title="অ্যালার্ম"></i>
                 </div>
                 <div class="content-scroll">
                     <div class="module-grid">
                         <div class="module-card" onclick="navTo('screen-nafl')"><i class="fa-solid fa-person-praying"></i><span data-i18n="naflPrayer">নফল নামায</span></div>
-                        <div class="module-card" onclick="navTo('screen-adhkar')"><i class="fa-solid fa-sparkles"></i><span data-i18n="adhkar">সকাল-সন্ধ্যার আমল</span></div>
-                        <div class="module-card" onclick="navTo('screen-dua')"><i class="fa-solid fa-book-open"></i><span data-i18n="duaLibrary">দোয়া লাইব্রেরি</span></div>
-                        <div class="module-card" onclick="navTo('screen-adhan')"><i class="fa-solid fa-bell"></i><span data-i18n="adhanAlarm">আজানের অ্যালার্ম</span></div>
+                        <div class="module-card" onclick="navTo('screen-adhkar')"><i class="fa-solid fa-wand-magic-sparkles"></i><span data-i18n="adhkar">সকাল-সন্ধ্যার আমল</span></div>
+                        <div class="module-card" onclick="navTo('screen-dua')"><i class="fa-solid fa-book-open"></i><span data-i18n="duaLibrary">মাসনুন দোয়া</span></div>
+                        <div class="module-card" onclick="openAlarmModal()"><i class="fa-solid fa-bell"></i><span data-i18n="adhanAlarm">নামাজের অ্যালার্ম</span></div>
                         <div class="module-card" onclick="navTo('screen-restricted')"><i class="fa-solid fa-clock"></i><span data-i18n="restrictedPrayer">নিষিদ্ধ সময়</span></div>
-                        <div class="module-card" onclick="navTo('screen-fasting')"><i class="fa-solid fa-moon"></i><span data-i18n="ramadan">রমজান</span></div>
+                        <div class="module-card" onclick="navTo('screen-fasting')"><i class="fa-solid fa-moon"></i><span data-i18n="ramadan">রমজান ও রোজা</span></div>
                         <div class="module-card" onclick="navTo('screen-sunnah-fasting')"><i class="fa-solid fa-sun"></i><span data-i18n="sunnahFasting">সুন্নত রোজা</span></div>
                         <div class="module-card" onclick="navTo('screen-more')"><i class="fa-solid fa-ellipsis"></i><span data-i18n="more">আরও</span></div>
                     </div>
                 </div>
             </div>
 
+            <!-- Prayer Times Screen with Dedicated Alarm Setting Option -->
             <div id="screen-prayer" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-home')"></i>
                     <h2 data-i18n="prayerTimes">নামাযের সময়সূচী</h2>
-                    <i class="fa-solid fa-gear"></i>
+                    <i class="fa-solid fa-bell" onclick="openAlarmModal()" title="অ্যালার্ম"></i>
                 </div>
                 <div class="content-scroll">
-                    <div class="list-card mt-20">
-                        <div class="list-item"><span>ফজর</span><span>৫:০২ AM</span></div>
-                        <div class="list-item"><span>সূর্যোদয়</span><span>৬:১৮ AM</span></div>
-                        <div class="list-item"><span>যোহর</span><span>১১:৫৮ AM</span></div>
-                        <div class="list-item active-list-item"><span>আসর (পরবর্তী)</span><div><span class="mr-10">৩:৪৫ PM</span><i class="fa-solid fa-bell"></i></div></div>
-                        <div class="list-item"><span>মাগরিব</span><span>৫:২২ PM</span></div>
-                        <div class="list-item"><span>ইশা</span><span>৬:৪৫ PM</span></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px;">
+                        <span class="status-pill-badge" id="prayer-screen-status" style="color:var(--emerald); background:rgba(7,91,69,0.08);"><i class="fa-solid fa-circle-check"></i> নিয়মিত ওয়াক্ত</span>
+                        <span class="source-tag" id="prayer-screen-source">Aladhan API</span>
                     </div>
-                    <button class="btn btn-outline w-100 mt-20" data-i18n="weeklySchedule">সাপ্তাহিক সময়সূচি</button>
-                    <p class="small-text text-center mt-10" data-i18n="calcMethod">গণনা পদ্ধতি: ইসলামিক ফাউন্ডেশন বাংলাদেশ</p>
+
+                    <!-- Prayer Timings Full List -->
+                    <div class="list-card mt-10">
+                        <div class="list-item" id="item-fajr">
+                            <span><i class="fa-solid fa-cloud-sun mr-10" style="color:var(--emerald);"></i>ফজর</span>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="time-val" id="detail-fajr">--:-- AM</span>
+                                <span class="alarm-toggle-btn" onclick="toggleSingleAlarm('Fajr', event)"><i class="fa-solid fa-bell"></i></span>
+                            </div>
+                        </div>
+                        <div class="list-item" id="item-sunrise">
+                            <span><i class="fa-solid fa-sun mr-10" style="color:var(--gold);"></i>সূর্যোদয়</span>
+                            <span class="time-val" id="detail-sunrise">--:-- AM</span>
+                        </div>
+                        <div class="list-item" id="item-dhuhr">
+                            <span><i class="fa-solid fa-sun mr-10" style="color:var(--emerald);"></i>যোহর</span>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="time-val" id="detail-dhuhr">--:-- PM</span>
+                                <span class="alarm-toggle-btn" onclick="toggleSingleAlarm('Dhuhr', event)"><i class="fa-solid fa-bell"></i></span>
+                            </div>
+                        </div>
+                        <div class="list-item" id="item-asr">
+                            <span><i class="fa-solid fa-cloud mr-10" style="color:var(--emerald);"></i>আসর</span>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="time-val" id="detail-asr">--:-- PM</span>
+                                <span class="alarm-toggle-btn" onclick="toggleSingleAlarm('Asr', event)"><i class="fa-solid fa-bell"></i></span>
+                            </div>
+                        </div>
+                        <div class="list-item" id="item-maghrib">
+                            <span><i class="fa-solid fa-mountain-sun mr-10" style="color:var(--gold);"></i>মাগরিব</span>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="time-val" id="detail-maghrib">--:-- PM</span>
+                                <span class="alarm-toggle-btn" onclick="toggleSingleAlarm('Maghrib', event)"><i class="fa-solid fa-bell"></i></span>
+                            </div>
+                        </div>
+                        <div class="list-item" id="item-isha">
+                            <span><i class="fa-solid fa-moon mr-10" style="color:var(--emerald);"></i>ইশা</span>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="time-val" id="detail-isha">--:-- PM</span>
+                                <span class="alarm-toggle-btn" onclick="toggleSingleAlarm('Isha', event)"><i class="fa-solid fa-bell"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Under Namaz Timing: Alarm Configuration Option -->
+                    <div class="card mt-15" style="border-left: 4px solid var(--emerald);">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>
+                                <h4 style="display:flex; align-items:center; gap:8px;">
+                                    <i class="fa-solid fa-stopwatch" style="color:var(--emerald);"></i>
+                                    নামাজের অ্যালার্ম ও সতর্কতা
+                                </h4>
+                                <p class="small-text text-secondary mt-5">ওয়াক্ত হওয়ার সময় অডিও/নোটিফিকেশন অ্যালার্ম সেট করুন</p>
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="openAlarmModal()">কাস্টমাইজ</button>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-outline w-100 mt-20" onclick="alert('সাপ্তাহিক ও মাসিক সময়সূচী শীঘ্রই সংযুক্ত করা হচ্ছে!')" data-i18n="weeklySchedule">সাপ্তাহিক সময়সূচি</button>
+                    <p class="small-text text-center mt-10" data-i18n="calcMethod">গণনা পদ্ধতি: ইসলামিক ফাউন্ডেশন বাংলাদেশ / করাচি বিশ্ববিদ্যালয়</p>
                 </div>
             </div>
 
+            <!-- Mosque Finder Screen -->
             <div id="screen-mosques" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <h2 data-i18n="mosqueFinder">মসজিদ খুঁজুন</h2>
-                    <div class="toggle-btn"><i class="fa-solid fa-map"></i></div>
+                    <div class="toggle-btn" onclick="refreshMosques()"><i class="fa-solid fa-rotate-right" title="রিফ্রেশ"></i></div>
                 </div>
                 <div class="content-scroll">
+                    <!-- Radius Indicator Badge banner configured from .env -->
+                    <div class="alarm-summary-banner mb-10" style="background:#fff; border:1px solid rgba(7,91,69,0.12);">
+                        <div>
+                            <span class="radius-badge"><i class="fa-solid fa-location-crosshairs"></i> <span id="mosque-radius-display">১ কিমি ব্যাসার্ধে অনুসন্ধান</span></span>
+                            <p class="small-text text-secondary mt-5" id="mosque-base-coords">বেস কোঅর্ডিনেট: 23°41'37.1"N, 90°27'01.2"E</p>
+                        </div>
+                        <i class="fa-solid fa-mosque" style="font-size:24px; color:var(--emerald); opacity:0.8;"></i>
+                    </div>
+
                     <div class="search-bar">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" placeholder="কাছের মসজিদ খুঁজুন...">
+                        <input type="text" id="mosque-search-input" placeholder="কাছের মসজিদ খুঁজুন..." oninput="filterMosques(this.value)">
                     </div>
 
-                    <div class="card mt-20" onclick="navTo('screen-mosque-detail')">
-                        <h4>বায়তুল মোকাররম জাতীয় মসজিদ</h4>
-                        <p class="text-secondary small-text">পল্টন, ঢাকা • ১.২ কিমি</p>
-                        <div class="tags mt-10">
-                            <span class="tag">জুমার নামাজ ১:৩০ PM</span>
-                            <span class="tag">নারীদের অংশ</span>
-                        </div>
-                    </div>
-
-                    <div class="card mt-10">
-                        <h4>গুলশান সোসাইটি মসজিদ</h4>
-                        <p class="text-secondary small-text">গুলশান ২, ঢাকা • ৪.৫ কিমি</p>
-                        <div class="tags mt-10">
-                            <span class="tag">জুমার নামাজ ১:১৫ PM</span>
-                            <span class="tag">এসি</span>
-                        </div>
+                    <!-- Live Mosques List -->
+                    <div id="mosques-list-container" class="mt-15">
+                        <p class="text-center text-secondary small-text mt-20">কাছের মসজিদ লোড করা হচ্ছে...</p>
                     </div>
                 </div>
             </div>
 
+            <!-- Mosque Detail Screen with Next Prayer Zamat Time -->
             <div id="screen-mosque-detail" class="screen bg-ivory has-bottom-nav">
-                <div class="cover-img mosque-cover">
+                <div class="cover-img mosque-cover" id="detail-mosque-cover">
                     <div class="back-btn-overlay" onclick="navTo('screen-mosques')"><i class="fa-solid fa-arrow-left"></i></div>
+                    <span class="mosque-photo-badge" id="detail-mosque-photo-source"><i class="fa-solid fa-camera"></i> গুগল ম্যাপস ব্যবহারকারীদের ছবি</span>
                 </div>
                 <div class="content-scroll overlap-content">
                     <div class="card header-card">
-                        <h2>বায়তুল মোকাররম</h2>
-                        <p class="text-secondary">পল্টন, ঢাকা • ১.২ কিমি</p>
+                        <h2 id="detail-mosque-name">বায়তুল মোকাররম</h2>
+                        <p class="text-secondary" id="detail-mosque-address">পল্টন, ঢাকা • ১.২ কিমি</p>
                         <div class="action-buttons mt-10">
-                            <button class="btn btn-primary"><i class="fa-solid fa-directions"></i> দিকনির্দেশ</button>
+                            <button class="btn btn-primary" id="btn-directions"><i class="fa-solid fa-diamond-turn-right"></i> দিকনির্দেশ (Google Maps)</button>
                         </div>
                     </div>
 
-                    <h3 class="section-title">আজকের জামাত</h3>
+                    <div class="alarm-summary-banner mt-15" style="background:#e8f4f0; border-color:var(--emerald);">
+                        <div>
+                            <strong style="color:var(--emerald); font-size:14px;"><i class="fa-solid fa-users"></i> পরবর্তী জামাতের সময়</strong>
+                            <p class="small-text text-secondary" id="detail-next-zamat-text">আসন্ন জামাত হিসাব করা হচ্ছে...</p>
+                        </div>
+                        <span class="zamat-pill" id="detail-next-zamat-badge">জামাত</span>
+                    </div>
+
+                    <h3 class="section-title mt-15">আজকের জামাতের সময়সূচী</h3>
                     <div class="list-card">
-                        <div class="list-item"><span>ফজর</span><span>৫:৩০ AM</span></div>
-                        <div class="list-item"><span>যোহর</span><span>১:০০ PM</span></div>
-                        <div class="list-item"><span>আসর</span><span>৪:১৫ PM</span></div>
-                        <div class="list-item"><span>মাগরিব</span><span>৫:৩০ PM</span></div>
-                        <div class="list-item"><span>ইশা</span><span>৭:১৫ PM</span></div>
+                        <div class="list-item"><span>ফজর জামাত</span><span id="zamat-fajr">৫:৩০ AM</span></div>
+                        <div class="list-item"><span>যোহর জামাত</span><span id="zamat-dhuhr">১:১৫ PM</span></div>
+                        <div class="list-item"><span>আসর জামাত</span><span id="zamat-asr">৪:১৫ PM</span></div>
+                        <div class="list-item"><span>মাগরিব জামাত (সূর্যাস্তের পর)</span><span id="zamat-maghrib">৫:২৫ PM</span></div>
+                        <div class="list-item"><span>ইশা জামাত</span><span id="zamat-isha">৭:৪৫ PM</span></div>
+                        <div class="list-item"><span>জুমু'আ জামাত</span><span id="zamat-juma">১:৩০ PM</span></div>
                     </div>
                 </div>
             </div>
 
+            <!-- Islamic Calendar Screen -->
             <div id="screen-calendar" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-home')"></i>
                     <h2 data-i18n="islamicCalendar">ইসলামিক ক্যালেন্ডার</h2>
-                    <div></div>
+                    <i class="fa-solid fa-moon"></i>
                 </div>
                 <div class="content-scroll">
                     <div class="card info-card">
-                        <div class="info-row"><span>হিজরি মাস</span><strong>রজব ১৪৪৫</strong></div>
-                        <div class="info-row"><span>স্থান</span><strong>ঢাকা</strong></div>
-                        <div class="info-row"><span>নোট</span><strong>চাঁদ দেখা অনুযায়ী তারিখ পরিবর্তিত হতে পারে</strong></div>
+                        <div class="info-row"><span>হিজরি তারিখ</span><strong id="cal-hijri-date">লোড হচ্ছে...</strong></div>
+                        <div class="info-row"><span>ইংরেজি তারিখ</span><strong id="cal-greg-date">লোড হচ্ছে...</strong></div>
+                        <div class="info-row"><span>স্থান</span><strong>ঢাকা, বাংলাদেশ</strong></div>
+                        <div class="info-row"><span>নোট</span><strong>চাঁদ দেখা সাপেক্ষে হিজরি তারিখ প্রযোজ্য</strong></div>
                     </div>
 
                     <div class="special-list">
-                        <div class="special-item" onclick="navTo('screen-special-day')"><span>শবে বরাত</span><span>৩০ শাবান</span></div>
-                        <div class="special-item" onclick="navTo('screen-special-day')"><span>শবে কদর</span><span>শেষ দশক</span></div>
-                        <div class="special-item" onclick="navTo('screen-special-day')"><span>জুমার দিন</span><span>সপ্তাহের পবিত্র দিন</span></div>
-                        <div class="special-item" onclick="navTo('screen-special-day')"><span>মহররম</span><span>মহান মাস</span></div>
-                        <div class="special-item" onclick="navTo('screen-special-day')"><span>আশুরা</span><span>১০ মহররম</span></div>
+                        <div class="special-item" onclick="navTo('screen-special-day')"><span>শবে বরাত</span><span>১৫ শাবান</span></div>
+                        <div class="special-item" onclick="navTo('screen-special-day')"><span>পবিত্র শবে কদর</span><span>শেষ দশক (রমজান)</span></div>
+                        <div class="special-item" onclick="navTo('screen-special-day')"><span>জুমার দিন</span><span>সাপ্তাহিক শ্রেষ্ঠ দিন</span></div>
+                        <div class="special-item" onclick="navTo('screen-special-day')"><span>পবিত্র আশুরা</span><span>১০ মহররম</span></div>
                         <div class="special-item" onclick="navTo('screen-special-day')"><span>আরাফার দিন</span><span>৯ জিলহজ</span></div>
                     </div>
                 </div>
             </div>
 
+            <!-- Special Day Screen -->
             <div id="screen-special-day" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-calendar')"></i>
-                    <h2>বিশেষ দিন</h2>
-                    <div></div>
+                    <h2>পবিত্র দিন ও রজনী</h2>
+                    <i class="fa-solid fa-star-and-crescent"></i>
                 </div>
                 <div class="content-scroll">
                     <div class="card detail-card">
-                        <p class="small-text text-secondary">উদাহরণ / সংক্ষিপ্ত তথ্য</p>
-                        <h3>শবে বরাত</h3>
-                        <p>শবে বরাতের রাতে আল্লাহর দরবারে ক্ষমা, হেদায়েত ও বরকতের জন্য দোয়া, দান ও পুণ্যের অভ্যাস রাখা হয়।</p>
+                        <p class="small-text text-secondary">গুরুত্ব ও ফজিলত</p>
+                        <h3>ইসলামিক বিশেষ দিনসমূহ</h3>
+                        <p>আল্লাহ তা'আলার সন্তুষ্টি ও মাগফিরাত কামনায় বিশেষ রাত এবং দিনগুলোতে অতিরিক্ত নফল ইবাদত, কুরআন তিলাওয়াত ও দান-সদকার গুরুত্ব রয়েছে।</p>
                         <div class="info-list">
-                            <div><strong>আমল:</strong> কুরআন পাঠ, ইস্তিগফার, দরুদ ও দোয়া</div>
-                            <div><strong>করণীয়:</strong> অতিরিক্ত ইবাদত, নফল নামায ও দান</div>
-                            <div><strong>বর্জনীয়:</strong> কৃত্রিম নির্দিষ্টতা ছাড়া অপ্রমাণিত দলীয় রীতি এড়িয়ে চলুন</div>
-                            <div><strong>দোয়া:</strong> "আল্লাহুম্মা ইন্না নাসআলুকা..." (উদাহরণ, নির্দেশিত তথ্যের জন্য উৎস যাচাই করুন)</div>
+                            <div><strong>আমল:</strong> অধিক পরিমাণে ইস্তিগফার ও দরুদ শরীফ পাঠ</div>
+                            <div><strong>করণীয়:</strong> নিয়মিত ফরজ নামাজের পর নফল নামাজ ও দোয়া</div>
+                            <div><strong>বর্জনীয়:</strong> শরীয়তবিরোধী বিদআত বা অপ্রমাণিত প্রথা পরিহার করা</div>
+                            <div><strong>দোয়া:</strong> "রাব্বানা আতিনা ফিদ-দুনিয়া হাসানাতাও ওয়া ফিল-আখিরাতি হাসানাহ"</div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Nafl Prayer Screen -->
             <div id="screen-nafl" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-ibadat')"></i>
                     <h2 data-i18n="naflPrayer">নফল নামায</h2>
-                    <div></div>
+                    <i class="fa-solid fa-person-praying"></i>
                 </div>
                 <div class="content-scroll">
                     <div class="list-card">
-                        <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>ইশরাক</span><span>দেখুন</span></div>
-                        <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>চাশত / দুহা</span><span>দেখুন</span></div>
-                        <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>তাহাজ্জুদ</span><span>দেখুন</span></div>
+                        <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>ইশরাক সালাত</span><span>দেখুন</span></div>
+                        <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>চাশত / সালাত উদ-দুহা</span><span>দেখুন</span></div>
+                        <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>তাহাজ্জুদ সালাত</span><span>দেখুন</span></div>
                         <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>তাহিয়াতুল ওযু</span><span>দেখুন</span></div>
                         <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>তাহিয়াতুল মসজিদ</span><span>দেখুন</span></div>
                         <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>সালাতুত তাসবিহ</span><span>দেখুন</span></div>
-                        <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>অন্যান্য নফল</span><span>দেখুন</span></div>
                     </div>
                 </div>
             </div>
 
+            <!-- Nafl Detail Screen -->
             <div id="screen-nafl-detail" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-nafl')"></i>
-                    <h2>ইশরাক</h2>
-                    <div></div>
+                    <h2>ইশরাক সালাত</h2>
+                    <i class="fa-solid fa-sun"></i>
                 </div>
                 <div class="content-scroll">
                     <div class="card detail-card">
-                        <p class="small-text text-secondary">উদাহরণ: সংক্ষিপ্ত ও সাম্প্রদায়িক পার্থক্য সংবলিত</p>
-                        <h3>নামাজের পরিচিতি</h3>
-                        <p>সূর্য ওঠার পর একটু দেরি করে আদায় করা নফল নামাজ। কিছু মাযহাবে এটি বিশেষভাবে গুরুত্ব দেয়।</p>
+                        <p class="small-text text-secondary">নফল নামাজের বিবরণ</p>
+                        <h3>ইশরাকের ফজিলত ও নিয়ম</h3>
+                        <p>সূর্যোদয়ের ১৫-২০ মিনিট পর এই নামাজ আদায় করা সুন্নত/মুস্তাহাব। এতে পূর্ণ একটি হজ ও উমরার সাওয়াবের সুসংবাদ রয়েছে হাদিস শরিফে।</p>
                         <div class="info-list">
-                            <div><strong>সময়:</strong> সূর্যোদয়ের পর, আনুমানিক সকাল ৮-১০ মিনিটের মধ্যে</div>
-                            <div><strong>রাকাত:</strong> ২ রাকাত (আনুমানিক; অনেকে ৪ রাকাত পর্যন্ত আদায় করেন)</div>
-                            <div><strong>অবস্থা:</strong> ওযু, পরিষ্কার পরিবেশ ও মনোযোগী হৃদয়</div>
-                            <div><strong>দোয়া:</strong> "আল্লাহুম্মা বারিক...” (উদাহরণ, উৎস যাচাই করা প্রয়োজন)</div>
-                            <div><strong>সতর্কতা:</strong> নির্বাচিত ফিকহ অনুযায়ী সময় ও রাকাতের পার্থক্য থাকতে পারে</div>
+                            <div><strong>সময়:</strong> সূর্যোদয়ের আনুমানিক ১৫-২০ মিনিট পর</div>
+                            <div><strong>রাকাত সংখ্যা:</strong> ২ থেকে ৪ রাকাত</div>
+                            <div><strong>নিয়ত:</strong> দুই রাকাত ইশরাকের নফল নামাজের নিয়ত করলাম</div>
+                            <div><strong>ফজিলত:</strong> তিরমিজি শরিফের হাদিসে মকবুল হজ ও ওমরার সমতুল্য সওয়াবের কথা এসেছে</div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Adhkar Screen -->
             <div id="screen-adhkar" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-ibadat')"></i>
                     <h2 data-i18n="adhkar">সকাল-সন্ধ্যার আমল</h2>
-                    <div></div>
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
                 </div>
                 <div class="content-scroll">
                     <div class="card adhkar-card">
-                        <h4>সকালবেলার আমল</h4>
-                        <p class="arabic">أَسْتَغْفِرُ اللَّهَ</p>
-                        <p class="bangla">আমি আল্লাহর নিকট ক্ষমা চাচ্ছি।</p>
-                        <p class="ref">উৎস: সহিহ হাদিসের ওপর ভিত্তি করে উদাহরণ</p>
+                        <h4>সকালবেলার আমল (ইস্তিগফার)</h4>
+                        <p class="arabic">أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ</p>
+                        <div class="pronunciation">
+                            <span class="pronunciation-label"><i class="fa-solid fa-language"></i> বাংলা উচ্চারণ:</span>
+                            "আস্তাগফিরুল্লা-হা ওয়া আতূবু ইলাইহি"
+                        </div>
+                        <p class="bangla"><strong>অর্থ:</strong> আমি আল্লাহর নিকট ক্ষমা প্রার্থনা করছি এবং তাঁর দিকেই প্রত্যাবর্তন করছি।</p>
+                        <p class="ref">উৎস: সহিহ বুখারি ও মুসলিম</p>
                         <div class="counter-row">
                             <button class="btn btn-outline btn-sm" onclick="toggleCounter(this)">অবস্থান: ০/১০</button>
-                            <span class="status-pill done">সমাপ্ত</span>
+                            <span class="status-pill">অসমাপ্ত</span>
                         </div>
                     </div>
 
                     <div class="card adhkar-card">
-                        <h4>সন্ধ্যাবেলার আমল</h4>
-                        <p class="arabic">بِسْمِ اللَّهِ</p>
-                        <p class="bangla">আল্লাহর নামে শুরু করছি।</p>
-                        <p class="ref">দৈনন্দিন আমল, উদাহরণ</p>
+                        <h4>বিপদমুক্তি ও হিফাজতের দোয়া</h4>
+                        <p class="arabic">بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ</p>
+                        <div class="pronunciation">
+                            <span class="pronunciation-label"><i class="fa-solid fa-language"></i> বাংলা উচ্চারণ:</span>
+                            "বিসমিল্লা-হিল্লাযী লা ইয়াদুররু মা'আসমিহী শাইউন ফিল আরদ্বি ওয়ালা ফিস-সামা-ই, ওয়া হুয়াস সামী'উল 'আলীম"
+                        </div>
+                        <p class="bangla"><strong>অর্থ:</strong> আল্লাহর নামে, যাঁর নামের সাথে জমিন ও আসমানের কোনো কিছুই ক্ষতি করতে পারে না, আর তিনি সর্বশ্রোতা, সর্বজ্ঞানী।</p>
+                        <p class="ref">উৎস: সুনানে আবু দাউদ ও তিরমিজি</p>
                         <div class="counter-row">
                             <button class="btn btn-outline btn-sm" onclick="toggleCounter(this)">অবস্থান: ০/১০</button>
                             <span class="status-pill">অসমাপ্ত</span>
@@ -343,180 +454,174 @@
                 </div>
             </div>
 
+            <!-- Dua Screen -->
             <div id="screen-dua" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-ibadat')"></i>
-                    <h2 data-i18n="duaLibrary">মাসনুন দোয়া</h2>
-                    <div></div>
+                    <h2 data-i18n="duaLibrary">মাসনুন দোয়া</h2>
+                    <i class="fa-solid fa-book-open"></i>
                 </div>
                 <div class="content-scroll">
                     <div class="search-bar">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" placeholder="দোয়া খুঁজুন...">
+                        <input type="text" id="dua-search-input" placeholder="দোয়া খুঁজুন..." oninput="filterDuas(this.value)">
                     </div>
-                    <div class="list-card mt-20">
-                        <div class="list-item clickable" onclick="navTo('screen-dua-detail')"><span>ঘুমানোর দোয়া</span><span>দেখুন</span></div>
-                        <div class="list-item clickable" onclick="navTo('screen-dua-detail')"><span>গাড়ি/ভ্রমণের দোয়া</span><span>দেখুন</span></div>
-                        <div class="list-item clickable" onclick="navTo('screen-dua-detail')"><span>খাবার শুরু করার দোয়া</span><span>দেখুন</span></div>
-                        <div class="list-item clickable" onclick="navTo('screen-dua-detail')"><span>খাবার শেষে দোয়া</span><span>দেখুন</span></div>
-                        <div class="list-item clickable" onclick="navTo('screen-dua-detail')"><span>মসজিদে প্রবেশের দোয়া</span><span>দেখুন</span></div>
+                    <div class="list-card mt-20" id="duas-list-container">
+                        <!-- Populated dynamically with full Arabic, Pronunciation & Translation -->
                     </div>
                 </div>
             </div>
 
+            <!-- Dua Detail Screen -->
             <div id="screen-dua-detail" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-dua')"></i>
-                    <h2>ঘুমানোর দোয়া</h2>
-                    <div></div>
+                    <h2 id="detail-dua-header">দোয়া বিস্তারিত</h2>
+                    <i class="fa-solid fa-book-open"></i>
                 </div>
                 <div class="content-scroll">
-                    <div class="card detail-card">
-                        <p class="arabic">بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي</p>
-                        <p class="bangla">হে আল্লাহ, আপনার নামের সাথে আমি শুই, আপনি আমাকে ঘুমাতে দিলেন।</p>
-                        <p class="ref">উৎস: সনদে ব্যবহৃত উদাহরণ; যাচাইকৃত দলিলের জন্য উৎস যাচাই করুন</p>
-                        <div class="share-row mt-10">
-                            <i class="fa-regular fa-heart"></i>
-                            <i class="fa-solid fa-copy"></i>
-                            <i class="fa-solid fa-share-nodes"></i>
-                        </div>
+                    <div class="card detail-card" id="detail-dua-content">
+                        <!-- Populated dynamically based on selected Dua -->
                     </div>
                 </div>
             </div>
 
+            <!-- Dedicated Adhan & Prayer Alarm Screen -->
             <div id="screen-adhan" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-ibadat')"></i>
-                    <h2>আজানের অ্যালার্ম</h2>
-                    <div></div>
+                    <h2>আজান ও অ্যালারম</h2>
+                    <i class="fa-solid fa-bell"></i>
                 </div>
                 <div class="content-scroll">
-                    <div class="setting-list">
-                        <div class="setting-item"><span>ফজর</span><span class="toggle active"></span></div>
-                        <div class="setting-item"><span>যোহর</span><span class="toggle active"></span></div>
-                        <div class="setting-item"><span>আসর</span><span class="toggle"></span></div>
-                        <div class="setting-item"><span>মাগরিব</span><span class="toggle active"></span></div>
-                        <div class="setting-item"><span>ইশা</span><span class="toggle active"></span></div>
+                    <div class="setting-list" id="adhan-screen-list">
+                        <div class="setting-item"><span>ফজর ওয়াক্ত</span><span class="toggle active" onclick="toggleSingleAlarm('Fajr')"></span></div>
+                        <div class="setting-item"><span>যোহর ওয়াক্ত</span><span class="toggle active" onclick="toggleSingleAlarm('Dhuhr')"></span></div>
+                        <div class="setting-item"><span>আসর ওয়াক্ত</span><span class="toggle active" onclick="toggleSingleAlarm('Asr')"></span></div>
+                        <div class="setting-item"><span>মাগরিব ওয়াক্ত</span><span class="toggle active" onclick="toggleSingleAlarm('Maghrib')"></span></div>
+                        <div class="setting-item"><span>ইশা ওয়াক্ত</span><span class="toggle active" onclick="toggleSingleAlarm('Isha')"></span></div>
                     </div>
 
                     <div class="card mt-20">
-                        <h4>আজানের সাউন্ড</h4>
-                        <div class="sound-options">
-                            <button class="chip active">মুয়াজ্জিন A</button>
-                            <button class="chip">মুয়াজ্জিন B</button>
-                            <button class="chip">আধুনিক</button>
-                            <button class="chip">শান্ত</button>
+                        <h4>আজানের সুর ও মুয়াজ্জিন নির্বাচন</h4>
+                        <div class="sound-options" id="sound-options-adhan">
+                            <button class="chip active" data-sound="baitul-mukarrom" onclick="selectAlarmTone('baitul-mukarrom')"><i class="fa-solid fa-mosque mr-5"></i>বায়তুল মোকাররম</button>
+                            <button class="chip" data-sound="makkah" onclick="selectAlarmTone('makkah')"><i class="fa-solid fa-kaaba mr-5"></i>মক্কার সুর</button>
+                            <button class="chip" data-sound="madinah" onclick="selectAlarmTone('madinah')"><i class="fa-solid fa-moon mr-5"></i>মদিনার সুর</button>
+                            <button class="chip" data-sound="al-aqsa" onclick="selectAlarmTone('al-aqsa')"><i class="fa-solid fa-place-of-worship mr-5"></i>আল-আকসা</button>
                         </div>
-                        <div class="info-row mt-10"><span>রিমাইন্ডার</span><strong>৫ মিনিট</strong></div>
-                        <div class="info-row"><span>সাইলেন্ট/ভাইব্রেশন</span><strong>ভাইব্রেশন</strong></div>
+                        <div class="info-row mt-15">
+                            <span>বর্তমান নির্বাচিত সুর</span>
+                            <strong id="selected-tone-label" style="color:var(--emerald);">বায়তুল মোকাররম জাতীয় মসজিদ</strong>
+                        </div>
+                        <div class="info-row mt-10">
+                            <button class="btn btn-outline btn-sm w-100" onclick="testAlarmSound()"><i class="fa-solid fa-volume-high"></i> নির্বাচিত আজানের সুর শুনুন</button>
+                        </div>
+                        <div class="info-row mt-10"><span>ওয়াক্তের পূর্বে সতর্কবার্তা</span><strong>১০ মিনিট আগে</strong></div>
+                        <div class="info-row"><span>অ্যালার্ম মোড</span><strong>অডিও ও কম্পন</strong></div>
                     </div>
                 </div>
             </div>
 
+            <!-- Restricted Times Screen -->
             <div id="screen-restricted" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-ibadat')"></i>
                     <h2>নিষিদ্ধ ও মাকরূহ সময়</h2>
-                    <div></div>
+                    <i class="fa-solid fa-clock"></i>
                 </div>
                 <div class="content-scroll">
                     <div class="card detail-card">
-                        <p class="small-text text-secondary">নমুনা ডেটা • প্রাথমিক উপস্থাপনা</p>
+                        <p class="small-text text-secondary">নামাজের নিষিদ্ধ সময়সমূহ</p>
                         <div class="info-list">
-                            <div><strong>সূর্যোদয়:</strong> ৬:১৮ AM – ৬:৩০ AM • সাধারণত নফল নামাজের জন্য সীমিত</div>
-                            <div><strong>মধ্যাহ্ন/ইস্তিওয়া:</strong> ১২:১২ PM – ১২:৩০ PM • বিশেষভাবে নির্ধারিত</div>
-                            <div><strong>সূর্যাস্ত:</strong> ৫:২২ PM – ৫:৩৫ PM • নির্দিষ্ট সময়ে নামাজে নিষেধাজ্ঞা</div>
-                            <div><strong>ব্যাখ্যা:</strong> মাযহাবভেদ অনুযায়ী সময়ের দিক থেকে পার্থক্য থাকতে পারে।</div>
+                            <div><strong>১. সূর্যোদয়ের সময়:</strong> সূর্য ওঠার পর থেকে প্রায় ১৫-২০ মিনিট পর্যন্ত (সালাত আদায় নিষেধ)</div>
+                            <div><strong>২. দ্বিপ্রহরের সময়:</strong> ঠিক দুপুরের সূর্য ঢলে পড়ার পূর্ব মুহূর্ত (জাওয়াল)</div>
+                            <div><strong>৩. সূর্যাস্তের সময়:</strong> সূর্য হলুদ বর্ণ ধারণ করা থেকে ডোবা পর্যন্ত (ঐ দিনের আসর ব্যতীত অন্য নামাজ নিষেধ)</div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Fasting Screen -->
             <div id="screen-fasting" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-ibadat')"></i>
                     <h2>সেহরি ও ইফতার</h2>
-                    <div></div>
+                    <i class="fa-solid fa-moon"></i>
                 </div>
                 <div class="content-scroll">
                     <div class="card info-card">
-                        <div class="info-row"><span>আজকের সেহরির শেষ</span><strong>৪:১৭ AM</strong></div>
-                        <div class="info-row"><span>ইফতার</span><strong>৫:২৩ PM</strong></div>
-                        <div class="info-row"><span>বাকি সময়</span><strong>০৮:৪৬:৫২</strong></div>
+                        <div class="info-row"><span>আজকের সেহরির শেষ সময়</span><strong id="fasting-sehri-time">--:-- AM</strong></div>
+                        <div class="info-row"><span>আজকের ইফতারের সময়</span><strong id="fasting-iftar-time">--:-- PM</strong></div>
                     </div>
 
                     <div class="card mt-20">
-                        <h4>রমজান ক্যালেন্ডার</h4>
-                        <div class="calendar-strip">
-                            <span class="day-pill active">১</span>
-                            <span class="day-pill">২</span>
-                            <span class="day-pill">৩</span>
-                            <span class="day-pill">৪</span>
-                            <span class="day-pill">৫</span>
-                            <span class="day-pill">৬</span>
-                            <span class="day-pill">৭</span>
+                        <p class="small-text text-secondary">ইফতারের সুন্নত দোয়া</p>
+                        <p class="arabic mt-10">اللَّهُمَّ لَكَ صُمْتُ وَعَلَى رِزْقِكَ أَفْطَرْتُ</p>
+                        <div class="pronunciation">
+                            <span class="pronunciation-label"><i class="fa-solid fa-language"></i> বাংলা উচ্চারণ:</span>
+                            "আল্লাহুম্মা লাকা ছুমতু ওয়া 'আলা রিযক্বিকা আফত্বারতু"
                         </div>
-                    </div>
-
-                    <div class="card mt-20">
-                        <p class="small-text text-secondary">নমুনা দোয়া</p>
-                        <p class="bangla">"আল্লাহুম্মা লাকা ছুমতু ওয়া আলা রিযকিকা আফত্বরু"</p>
-                        <p class="ref">উদাহরণ, যাচাই করা প্রয়োজন</p>
+                        <p class="bangla" style="font-size:13px; color:var(--text-sec); margin-top:4px;"><strong>অর্থ:</strong> হে আল্লাহ! আমি তোমারই জন্য রোজা রেখেছি এবং তোমারই রিজিক দিয়ে ইফতার করছি।</p>
                     </div>
                 </div>
             </div>
 
+            <!-- Sunnah Fasting Screen -->
             <div id="screen-sunnah-fasting" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-ibadat')"></i>
                     <h2>সুন্নত রোজা</h2>
-                    <div></div>
+                    <i class="fa-solid fa-sun"></i>
                 </div>
                 <div class="content-scroll">
                     <div class="special-list">
-                        <div class="special-item" onclick="navTo('screen-more')"><span>সোমবার</span><span>সুন্নত</span></div>
-                        <div class="special-item" onclick="navTo('screen-more')"><span>বৃহস্পতিবার</span><span>সুন্নত</span></div>
-                        <div class="special-item" onclick="navTo('screen-more')"><span>আইয়ামে বিজ</span><span>১৩, ১৪, ১৫</span></div>
-                        <div class="special-item" onclick="navTo('screen-more')"><span>আশুরার রোজা</span><span>১০ মহররম</span></div>
-                        <div class="special-item" onclick="navTo('screen-more')"><span>আরাফার দিন</span><span>৯ জিলহজ</span></div>
-                        <div class="special-item" onclick="navTo('screen-more')"><span>শাওয়ালের ছয় রোজা</span><span>পরে</span></div>
+                        <div class="special-item"><span>প্রতি সোমবারের রোজা</span><span>সাপ্তাহিক সুন্নত</span></div>
+                        <div class="special-item"><span>প্রতি বৃহস্পতিবারের রোজা</span><span>সাপ্তাহিক সুন্নত</span></div>
+                        <div class="special-item"><span>আইয়ামে বীজের রোজা</span><span>চান্দ্র মাসের ১৩, ১৪, ১৫</span></div>
+                        <div class="special-item"><span>আশুরার রোজা</span><span>৯ ও ১০ মহররম</span></div>
+                        <div class="special-item"><span>আরাফার রোজা</span><span>৯ জিলহজ (হজ ব্যতীতদের জন্য)</span></div>
+                        <div class="special-item"><span>শাওয়ালের ছয় রোজা</span><span>ঈদুল ফিতরের পর</span></div>
                     </div>
                 </div>
             </div>
 
+            <!-- Qibla Screen -->
             <div id="screen-qibla" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-home')"></i>
                     <h2 data-i18n="qiblaDirection">কিবলা দিক</h2>
-                    <div></div>
+                    <i class="fa-solid fa-compass"></i>
                 </div>
                 <div class="content-scroll flex-center">
-                    <p class="text-center mb-20">ঢাকা, বাংলাদেশ<br>কাবার দূরত্ব: ৪,৫২০ কিমি</p>
+                    <p class="text-center mb-20">ঢাকা, বাংলাদেশ<br>কাবার দিক: ২৭৮° (পশ্চিম-উত্তর-পশ্চিম)</p>
                     <div class="compass-container">
                         <div class="compass-ring">
                             <div class="qibla-pointer"><i class="fa-solid fa-location-arrow"></i></div>
                         </div>
                     </div>
-                    <p class="text-center mt-30 small-text">ফিগার ৮ আকৃতিতে ফোন নাড়িয়ে ক্যালিব্রেট করুন।</p>
+                    <p class="text-center mt-30 small-text">স্মার্টফোনের সেন্সর ক্যালিব্রেট করতে 8 আকৃতিতে ঘুরান।</p>
                 </div>
             </div>
 
+            <!-- More Screen -->
             <div id="screen-more" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-ibadat')"></i>
                     <h2 data-i18n="more">আরও</h2>
-                    <div></div>
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
                 </div>
                 <div class="content-scroll">
                     <div class="list-card">
                         <div class="list-item clickable" onclick="navTo('screen-bazaar')"><span>হালাল বাজার</span><span>দেখুন</span></div>
                         <div class="list-item clickable" onclick="navTo('screen-calendar')"><span>ইসলামিক ক্যালেন্ডার</span><span>দেখুন</span></div>
                         <div class="list-item clickable" onclick="navTo('screen-nafl')"><span>নফল নামায</span><span>দেখুন</span></div>
-                        <div class="list-item clickable" onclick="navTo('screen-dua')"><span>দোয়া</span><span>দেখুন</span></div>
+                        <div class="list-item clickable" onclick="navTo('screen-dua')"><span>মাসনুন দোয়া</span><span>দেখুন</span></div>
                     </div>
                 </div>
             </div>
 
+            <!-- Halal Bazaar Screen -->
             <div id="screen-bazaar" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-more')"></i>
@@ -526,59 +631,63 @@
                 <div class="content-scroll">
                     <div class="search-bar">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" placeholder="খাবার, বই, কাপড় খুঁজুন...">
+                        <input type="text" placeholder="খাবার, বই, পোশাক খুঁজুন...">
                     </div>
 
                     <div class="category-grid mt-20">
                         <div class="cat-item"><div class="cat-icon"><i class="fa-solid fa-utensils"></i></div><span>রেস্তোরাঁ</span></div>
-                        <div class="cat-item"><div class="cat-icon"><i class="fa-solid fa-drumstick-bite"></i></div><span>মাংস</span></div>
-                        <div class="cat-item"><div class="cat-icon"><i class="fa-solid fa-shirt"></i></div><span>কাপড়</span></div>
+                        <div class="cat-item"><div class="cat-icon"><i class="fa-solid fa-drumstick-bite"></i></div><span>গোশত</span></div>
+                        <div class="cat-item"><div class="cat-icon"><i class="fa-solid fa-shirt"></i></div><span>পোশাক</span></div>
                         <div class="cat-item"><div class="cat-icon"><i class="fa-solid fa-book"></i></div><span>বই</span></div>
                     </div>
 
-                    <h3 class="section-title">ঢাকার বিখ্যাত স্থান</h3>
+                    <h3 class="section-title">কাছের বিশ্বস্ত স্থান</h3>
                     <div class="card bazaar-card" onclick="navTo('screen-biz-detail')">
                         <div class="bazaar-img"></div>
                         <div class="bazaar-info">
-                            <h4>স্টার খাবার & রেস্টুরেন্ট</h4>
-                            <p class="text-secondary small-text">ধানমন্ডি • ২.৩ কিমি</p>
-                            <span class="tag mt-5"><i class="fa-solid fa-check-circle" style="color:var(--emerald);"></i> মুসলিম মালিকানাধীন</span>
+                            <h4>স্টার কাবাব & রেস্টুরেন্ট</h4>
+                            <p class="text-secondary small-text">যাত্রাবাড়ী মোড় • ০.৭ কিমি</p>
+                            <span class="tag mt-5"><i class="fa-solid fa-check-circle" style="color:var(--emerald);"></i> হালাল প্রত্যয়িত</span>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Business Detail Screen -->
             <div id="screen-biz-detail" class="screen bg-ivory has-bottom-nav">
                 <div class="cover-img biz-cover">
                     <div class="back-btn-overlay" onclick="navTo('screen-bazaar')"><i class="fa-solid fa-arrow-left"></i></div>
                 </div>
                 <div class="content-scroll overlap-content">
                     <div class="card header-card">
-                        <h2>স্টার খাবার & রেস্টুরেন্ট</h2>
-                        <p class="text-secondary">ধানমন্ডি, ঢাকা • ২.৩ কিমি</p>
+                        <h2>স্টার কাবাব & রেস্টুরেন্ট</h2>
+                        <p class="text-secondary">যাত্রাবাড়ী, ঢাকা • ০.৭ কিমি</p>
                         <div class="halal-status mt-10">
                             <i class="fa-solid fa-shield-halal" style="color:var(--emerald); font-size:24px;"></i>
                             <div>
-                                <strong>হালাল যাচাইকৃত</strong>
-                                <p class="small-text">মুসলিম মালিকানাধীন, স্থানীয় মাংস ব্যবহার।</p>
+                                <strong>হালাল খাবার নিশ্চিত</strong>
+                                <p class="small-text">মুসলিম মালিকানাধীন এবং শতভাগ হালাল প্রক্রিয়ায় প্রস্তুতকৃত।</p>
                             </div>
                         </div>
                         <div class="action-buttons mt-10">
-                            <button class="btn btn-outline" style="flex:1;"><i class="fa-solid fa-phone"></i> কল</button>
+                            <button class="btn btn-outline" style="flex:1;"><i class="fa-solid fa-phone"></i> কল করুন</button>
                             <button class="btn btn-primary" style="flex:1;"><i class="fa-solid fa-directions"></i> মানচিত্র</button>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <!-- Profile Screen -->
             <div id="screen-profile" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <h2 data-i18n="profile">প্রোফাইল</h2>
+                    <i class="fa-solid fa-gear"></i>
                 </div>
                 <div class="content-scroll">
                     <div class="profile-header text-center mt-20">
                         <div class="avatar"><i class="fa-regular fa-user"></i></div>
-                        <h3 class="mt-10">অতিথি ব্যবহারকারী</h3>
+                        <h3 class="mt-10" id="profile-user-title">মুসাফির ব্যবহারকারী</h3>
+                        <p class="small-text text-secondary" id="profile-role-badge">মুসাফির মোড সক্রিয়</p>
                         <button class="btn btn-outline btn-sm mt-10" data-i18n="registerLogin">সাইন ইন / রেজিস্টার</button>
                     </div>
 
@@ -588,23 +697,28 @@
                             <span class="text-secondary"><button class="lang-switch small-btn" data-lang="bn">বাংলা</button> / <button class="lang-switch small-btn" data-lang="en">EN</button></span>
                         </div>
                         <div class="setting-item">
-                            <div><i class="fa-solid fa-location-dot mr-10"></i> <span data-i18n="location">লোকেশন</span></div>
-                            <span class="text-secondary">ঢাকা <i class="fa-solid fa-chevron-right ml-10"></i></span>
+                            <div><i class="fa-solid fa-location-dot mr-10"></i> <span data-i18n="location">বেস লোকেশন</span></div>
+                            <span class="text-secondary" id="profile-location-text">যাত্রাবাড়ী/দনিয়া, ঢাকা <i class="fa-solid fa-chevron-right ml-10"></i></span>
+                        </div>
+                        <div class="setting-item" onclick="openAlarmModal()">
+                            <div><i class="fa-solid fa-bell mr-10"></i> <span data-i18n="notifications">নামাজের অ্যালার্ম সেটিংস</span></div>
+                            <i class="fa-solid fa-chevron-right text-secondary"></i>
                         </div>
                         <div class="setting-item">
-                            <div><i class="fa-solid fa-bell mr-10"></i> <span data-i18n="notifications">নোটিশ</span></div>
-                            <i class="fa-solid fa-chevron-right text-secondary"></i>
+                            <div><i class="fa-solid fa-bullseye mr-10"></i> <span>মসজিদ সার্চ ব্যাসার্ধ</span></div>
+                            <span class="text-secondary" id="profile-radius-text">১.০ কিমি (.env) <i class="fa-solid fa-chevron-right ml-10"></i></span>
                         </div>
                         <div class="setting-item">
                             <div><i class="fa-solid fa-gear mr-10"></i> <span data-i18n="prayerMethod">নামাজের ক্যালকুলেশন</span></div>
-                            <i class="fa-solid fa-chevron-right text-secondary"></i>
+                            <span class="text-secondary">করাচি / ইসলামিক ফাউন্ডেশন BD</span>
                         </div>
                     </div>
 
-                    <p class="small-text text-center text-secondary mt-30">Ummah Connect v1.0.0<br>বাংলাদেশের জন্য তৈরি <i class="fa-solid fa-heart" style="color:var(--gold)"></i></p>
+                    <p class="small-text text-center text-secondary mt-30">Muslim Ummah v2.0.0<br>বাংলাদেশের মুসলমানদের জন্য নিবেদিত <i class="fa-solid fa-heart" style="color:var(--gold)"></i></p>
                 </div>
             </div>
 
+            <!-- Bottom Navigation -->
             <div class="bottom-nav">
                 <div class="nav-item active" onclick="navTo('screen-home', this)">
                     <i class="fa-solid fa-house"></i>
@@ -627,9 +741,42 @@
                     <span data-i18n="navProfile">প্রোফাইল</span>
                 </div>
             </div>
+
+            <!-- Modal for Prayer Alarm Configuration -->
+            <div id="alarm-modal-backdrop" class="alarm-modal-backdrop" onclick="closeAlarmModal(event)">
+                <div class="alarm-modal" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h3><i class="fa-solid fa-bell" style="color:var(--emerald); margin-right:8px;"></i> নামাজের অ্যালার্ম সেট করুন</h3>
+                        <i class="fa-solid fa-xmark modal-close-btn" onclick="closeAlarmModal()"></i>
+                    </div>
+                    <p class="small-text text-secondary mb-15">প্রতিটি ওয়াক্তের জন্য অ্যালার্ম চালু করুন এবং কাস্টম অ্যালার্মের সময় নির্ধারণ করুন।</p>
+
+                    <div id="alarm-pickers-container">
+                        <!-- Dynamically populated rows for Fajr, Dhuhr, Asr, Maghrib, Isha -->
+                    </div>
+
+                    <div class="card mt-15" style="border:1.5px solid rgba(7,91,69,0.15); background:#fcfbf7;">
+                        <h4 style="font-size:14px;"><i class="fa-solid fa-music" style="color:var(--emerald); margin-right:6px;"></i> আজানের সুর (Alarm Sound)</h4>
+                        <div class="sound-options mt-10" id="modal-sound-options">
+                            <button class="chip active" data-sound="baitul-mukarrom" onclick="selectAlarmTone('baitul-mukarrom')">বায়তুল মোকাররম</button>
+                            <button class="chip" data-sound="makkah" onclick="selectAlarmTone('makkah')">মক্কার সুর</button>
+                            <button class="chip" data-sound="madinah" onclick="selectAlarmTone('madinah')">মদিনার সুর</button>
+                            <button class="chip" data-sound="al-aqsa" onclick="selectAlarmTone('al-aqsa')">আল-আকসা</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:15px; display:flex; gap:10px;">
+                        <button class="btn btn-outline" style="flex:1;" onclick="testAlarmSound()"><i class="fa-solid fa-volume-high"></i> আজান টেস্ট</button>
+                        <button class="btn btn-primary" style="flex:1;" onclick="saveAlarms()"><i class="fa-solid fa-check"></i> সংরক্ষণ করুন</button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
+    <!-- Configuration & Application Scripts -->
+    <script src="config.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
