@@ -105,4 +105,7 @@ Then visit: `http://localhost:8000`
 
 - **Prayer Timings API**: [Aladhan REST API](https://api.aladhan.com) (free, public, no key required).
 - **Mosque Locator API**: [OpenStreetMap Nominatim](https://nominatim.openstreetmap.org) with bounded coordinates.
-- **Audio Synthesis**: Native HTML5 Web Audio API `AudioContext`.
+- **Audio Synthesis**: Native HTML5 Web Audio API `AudioContext` with custom Azan melodies from Baitul Mukarrom, Makkah, Madinah, and Al-Aqsa.
+- **Live Waqt & Makruh Detection**: Automatic detection of active Waqt, plus automated alerts for the 3 canonical forbidden prayer times (Sunrise, Zawwal, and Sunset).
+- **Masnoon Duas**: Authentic hadith references, full Arabic text, Bengali pronunciation, and Bengali translation.
+- **Weekly Schedule**: Dynamic 7-day prayer schedule based on solar calculation and Islamic Foundation Bangladesh standards.

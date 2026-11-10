@@ -1086,6 +1086,211 @@ function setLanguage(lang) {
     applyTranslations();
 }
 
+// Weekly Prayer Times Generator & Modal
+function openWeeklyModal() {
+    const backdrop = document.getElementById('weekly-modal-backdrop');
+    const container = document.getElementById('weekly-table-container');
+    if (!container || !backdrop) return;
+
+    const days = ['রবিবার', 'সোমবার', 'মঙ্গলবার', 'বুধবার', 'বৃহস্পতিবার', 'শুক্রবার', 'শনিবার'];
+    const now = new Date();
+    let html = `
+        <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:center;">
+                <thead>
+                    <tr style="background:#e8f4f0; color:var(--emerald);">
+                        <th style="padding:6px; border:1px solid #ddd;">দিন</th>
+                        <th style="padding:6px; border:1px solid #ddd;">ফজর</th>
+                        <th style="padding:6px; border:1px solid #ddd;">যোহর</th>
+                        <th style="padding:6px; border:1px solid #ddd;">আসর</th>
+                        <th style="padding:6px; border:1px solid #ddd;">মাগরিব</th>
+                        <th style="padding:6px; border:1px solid #ddd;">ইশা</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+        const dayName = days[d.getDay()];
+        const isToday = i === 0;
+        // Minor solar delta simulation across week
+        const fajr = addMinutesToTime(state.timings.Fajr, i);
+        const dhuhr = state.timings.Dhuhr;
+        const asr = addMinutesToTime(state.timings.Asr, i);
+        const maghrib = addMinutesToTime(state.timings.Maghrib, -i);
+        const isha = addMinutesToTime(state.timings.Isha, -i);
+
+        html += `
+            <tr style="${isToday ? 'background:rgba(214,182,109,0.18); font-weight:700;' : ''}">
+                <td style="padding:6px; border:1px solid #ddd;">${dayName}${isToday ? ' (আজ)' : ''}</td>
+                <td style="padding:6px; border:1px solid #ddd;">${format12Hour(fajr).replace(' AM', '')}</td>
+                <td style="padding:6px; border:1px solid #ddd;">${format12Hour(dhuhr).replace(' PM', '')}</td>
+                <td style="padding:6px; border:1px solid #ddd;">${format12Hour(asr).replace(' PM', '')}</td>
+                <td style="padding:6px; border:1px solid #ddd;">${format12Hour(maghrib).replace(' PM', '')}</td>
+                <td style="padding:6px; border:1px solid #ddd;">${format12Hour(isha).replace(' PM', '')}</td>
+            </tr>
+        `;
+    }
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    container.innerHTML = html;
+    backdrop.classList.add('active');
+}
+
+function closeWeeklyModal(e) {
+    if (e && e.target && e.target.id !== 'weekly-modal-backdrop' && !e.target.classList.contains('modal-close-btn')) {
+        return;
+    }
+    const backdrop = document.getElementById('weekly-modal-backdrop');
+    if (backdrop) backdrop.classList.remove('active');
+}
+
+// Special Days & Nafl Prayer Details Database
+const SPECIAL_DAYS_DATA = {
+    'shab_e_barat': {
+        title: 'শবে বরাত (লাইলাতুল বরাত)',
+        date: '১৫ শাবান দিবাগত রাত',
+        desc: 'আল্লাহ তাআলার রহমত, মাগফিরাত ও ক্ষমা প্রার্থনার বিশেষ রজনী। এই রাতে বান্দার গুনাহ মাফ ও হেদায়েত প্রার্থনা করা হয়।',
+        info: [
+            { label: 'আমল', text: 'অধিক পরিমাণে ইস্তিগফার, নফল নামাজ, কুরআন তিলাওয়াত ও দোয়া।' },
+            { label: 'নফল রোজা', text: 'পরের দিন (১৫ শাবান) নফল রোজা রাখা মুস্তাহাব।' },
+            { label: 'বর্জনীয়', text: 'অপ্রমাণিত কোনো আনুষ্ঠানিকতা বা আলোকসজ্জা পরিহার করে একাগ্রচিত্তে আল্লাহর ইবাদতে মশগুল থাকা।' }
+        ]
+    },
+    'shab_e_qadr': {
+        title: 'পবিত্র শবে কদর (লাইলাতুল কদর)',
+        date: 'রমজানুল মুবারকের শেষ দশকের বিজোড় রাত (২১, ২৩, ২৫, ২৭, ২৯)',
+        desc: 'হাজার মাসের চেয়েও উত্তম ও বরকতময় এক মহামহিম রাত। এই পবিত্র রজনীতে মহাগ্রন্থ পবিত্র কুরআনুল কারিম নাজিল হয়েছিল।',
+        info: [
+            { label: 'বিশেষ ফজিলত', text: 'কুরআনুল কারিমের সূরা আল-কদরে ঘোষণা করা হয়েছে—লাইলাতুল কদর এক হাজার মাসের চেয়েও শ্রেষ্ঠ।' },
+            { label: 'রাসূলুল্লাহ (সা.) এর শেখানো দোয়া', text: '"আল্লাহুম্মা ইন্নাকা \'আফুউন তুহিব্বুল \'আফওয়া ফা\'ফু \'আন্নী" (হে আল্লাহ, আপনি পরম ক্ষমাশীল, ক্ষমা ভালোবাসেন, অতএব আমাকে ক্ষমা করুন)।' },
+            { label: 'আমল', text: 'কিয়ামুল লাইল (তাহাজ্জুদ), দান-সদকা, দীর্ঘ সেজদায় রোনাজারি।' }
+        ]
+    },
+    'juma': {
+        title: 'জুমার দিন (ইয়াউমুল জুমু\'আ)',
+        date: 'সাপ্তাহিক শ্রেষ্ঠ দিন (প্রতি শুক্রবার)',
+        desc: 'সপ্তাহের শ্রেষ্ঠতম মুবারক দিন। মুসলমানদের জন্য এই দিনটি সাপ্তাহিক ঈদের সমতুল্য মর্যাদাপূর্ণ।',
+        info: [
+            { label: 'আমল ও সুন্নত', text: 'উত্তমরূপে গোসল করা, পরিষ্কার পোশাক পরিধান করা, সুগন্ধি ব্যবহার এবং সূরা কাহাফ তিলাওয়াত করা।' },
+            { label: 'দরুদ শরীফ', text: 'জুমার দিনে রাসূলুল্লাহ (সা.)-এর প্রতি অধিক পরিমাণে দরুদ পাঠ করার বিশেষ তাগিদ রয়েছে।' },
+            { label: 'দোয়া কবুলের সময়', text: 'আসরের পর থেকে সূর্যাস্ত পর্যন্ত বিশেষ মুহূর্তে দোয়া কবুল হয়।' }
+        ]
+    },
+    'ashura': {
+        title: 'পবিত্র আশুরা',
+        date: '১০ মহররম',
+        desc: 'ইসলামের ইতিহাসে বহু স্মরণীয় তাৎপর্যপূর্ণ ঘটনার ঐতিহাসিক দিন। এই দিনে মূসা (আ.) ও বনী ইসরাঈল ফেরাউনের কবল থেকে মুক্তি পেয়েছিলেন।',
+        info: [
+            { label: 'সুন্নত রোজা', text: '৯ ও ১০ মহররম অথবা ১০ ও ১১ মহররম দুইটি নফল রোজা রাখা সুন্নতে মুয়াক্কাদা।' },
+            { label: 'ফজিলত', text: 'হাদিস শরিফে এসেছে, আশুরার রোজা পূর্ববর্তী এক বছরের সগিরা গুনাহের কাফফারা স্বরূপ।' }
+        ]
+    },
+    'arafa': {
+        title: 'আরাফার দিন (ইয়াউমে আরাফাহ)',
+        date: '৯ জিলহজ',
+        desc: 'হজের মূল দিন এবং বছরের শ্রেষ্ঠতম ফজিলতপূর্ণ দিনগুলোর অন্যতম।',
+        info: [
+            { label: 'হজব্যতীত ব্যক্তিদের রোজা', text: 'যারা হজে নেই তাদের জন্য ৯ জিলহজ আরাফার রোজা রাখা অত্যন্ত সওয়াবের কাজ।' },
+            { label: 'ফজিলত', text: 'সহিহ মুসলিমের হাদিসে এসেছে, আরাফার দিনের রোজা পূর্ববর্তী এক বছর ও পরবর্তী এক বছরের গুনাহ মোচন করে।' },
+            { label: 'তাকবিরে তাশরিক', text: '৯ জিলহজ ফজর থেকে ১৩ জিলহজ আসর পর্যন্ত প্রত্যেক ফরজ নামাজের পর তাকবিরে তাশরিক পাঠ ওয়াজিব।' }
+        ]
+    }
+};
+
+const NAFL_PRAYER_DATA = {
+    'ishraq': {
+        title: 'ইশরাক সালাত',
+        time: 'সূর্যোদয়ের আনুমানিক ১৫-২০ মিনিট পর থেকে শুরু',
+        rakat: '২ থেকে ৪ রাকাত',
+        desc: 'সূর্য পুরোপুরি ওঠার পর আদায়কৃত নফল নামাজ। তিরমিজি শরিফের হাদিস অনুযায়ী পূর্ণ একটি গ্রহণযোগ্য হজ ও ওমরার সমতুল্য সওয়াব মেলে।',
+        niyyat: 'দুই রাকাত ইশরাকের নফল নামাজ আদায় করছি।'
+    },
+    'chasht': {
+        title: 'চাশত / সালাত উদ-দুহা',
+        time: 'পূর্বাহ্নে যখন সূর্যের তাপ বৃদ্ধি পায় (সকাল ৯:৩০ থেকে জাওয়ালের পূর্ব পর্যন্ত)',
+        rakat: '২, ৪, ৮ বা ১২ রাকাত (সাধারণত ৪ রাকাত উত্তম)',
+        desc: 'শরীরের প্রতিটি জোড়ের সদকাস্বরূপ এই সালাত বান্দার রিজিক ও হেফাযতে বরকত বয়ে আনে।',
+        niyyat: 'সালাতুদ দুহা / চাশতের নফল নামাজ আদায় করছি।'
+    },
+    'tahajjud': {
+        title: 'তাহাজ্জুদ সালাত',
+        time: 'রাতের শেষ তৃতীয়াংশে (ফজরের সুবহে সাদিকের পূর্ব পর্যন্ত)',
+        rakat: '২ থেকে ১২ রাকাত (২ রাকাত করে আদায়)',
+        desc: 'সকল নফল নামাজের মধ্যে শ্রেষ্ঠতম মর্যাদাপূর্ণ নামাজ। আল্লাহ তাআলা রাতের শেষ তৃতীয়াংশে প্রথম আসমানে অবতরণ করে বান্দার দোয়া কবুল করেন।',
+        niyyat: 'তাহাজ্জুদের নফল নামাজ আল্লাহর সন্তুষ্টির উদ্দেশ্যে আদায় করছি।'
+    },
+    'wudu': {
+        title: 'তাহিয়াতুল ওযু',
+        time: 'ওযু করার পর অঙ্গ শুকানোর পূর্বে',
+        rakat: '২ রাকাত',
+        desc: 'মনোযোগ সহকারে ওযু সম্পন্ন করে দুই রাকাত নামাজ আদায়কারী বান্দার জন্য জান্নাত ওয়াজিব হয়ে যাওয়ার সুসংবাদ রয়েছে হাদিস শরিফে।',
+        niyyat: 'তাহিয়াতুল ওযুর দুই রাকাত নফল নামাজ আদায় করছি।'
+    },
+    'masjid': {
+        title: 'তাহিয়াতুল মসজিদ',
+        time: 'মসজিদে প্রবেশ করার পর বসার পূর্বে',
+        rakat: '২ রাকাত',
+        desc: 'মসজিদের সম্মানার্থে বসার পূর্বেই এই দুই রাকাত নামাজ আদায় করা সুন্নত/মুস্তাহাব।',
+        niyyat: 'তাহিয়াতুল মসজিদের দুই রাকাত নফল নামাজ আদায় করছি।'
+    },
+    'tasbih': {
+        title: 'সালাতুত তাসবিহ',
+        time: 'মাকরূহ সময় ব্যতীত দিন বা রাতের যেকোনো সময়',
+        rakat: '৪ রাকাত (বিশেষ তাসবিহসহ)',
+        desc: 'এই নামাজে ৩০০ বার "সুবহানাল্লাহি ওয়াল হামদুলিল্লাহি ওয়া লা ইলাহা ইল্লাল্লাহু ওয়াল্লাহু আকবার" পাঠ করা হয়। জীবনের পূর্বাপর সকল গুনাহ মাফের সুসংবাদ রয়েছে।',
+        niyyat: 'সালাতুত তাসবিহের চার রাকাত নামাজ আদায় করছি।'
+    }
+};
+
+function openSpecialDay(key) {
+    const data = SPECIAL_DAYS_DATA[key] || SPECIAL_DAYS_DATA['shab_e_barat'];
+    const header = document.getElementById('special-day-header');
+    const content = document.getElementById('special-day-content');
+    if (header) header.textContent = data.title;
+    if (content) {
+        let infoHtml = '';
+        data.info.forEach(item => {
+            infoHtml += `<div><strong>${item.label}:</strong> ${item.text}</div>`;
+        });
+        content.innerHTML = `
+            <p class="small-text text-secondary">${data.date}</p>
+            <h3 class="mt-5">${data.title}</h3>
+            <p class="mt-10">${data.desc}</p>
+            <div class="info-list mt-15">
+                ${infoHtml}
+            </div>
+        `;
+    }
+    navTo('screen-special-day');
+}
+
+function openNaflDetail(key) {
+    const data = NAFL_PRAYER_DATA[key] || NAFL_PRAYER_DATA['ishraq'];
+    const header = document.getElementById('nafl-detail-header');
+    const content = document.getElementById('nafl-detail-content');
+    if (header) header.textContent = data.title;
+    if (content) {
+        content.innerHTML = `
+            <p class="small-text text-secondary">নফল নামাজের বিস্তারিত বিবরণ</p>
+            <h3 class="mt-5">${data.title}</h3>
+            <p class="mt-10">${data.desc}</p>
+            <div class="info-list mt-15">
+                <div><strong>সময়:</strong> ${data.time}</div>
+                <div><strong>রাকাত সংখ্যা:</strong> ${data.rakat}</div>
+                <div><strong>নিয়তের মর্ম:</strong> "${data.niyyat}"</div>
+            </div>
+        `;
+    }
+    navTo('screen-nafl-detail');
+}
+
 // Masnoon Dua Library with Arabic, Bengali Pronunciation, and Bengali Translation
 const MASNOON_DUAS = [
     {
@@ -1251,6 +1456,123 @@ function navTo(screenId, navElement = null) {
     }
 }
 
+// Halal Bazaar Listings Database & Filter
+const BAZAAR_LISTINGS = [
+    {
+        id: 'star_kabab',
+        category: 'restaurant',
+        name: 'স্টার কাবাব & রেস্টুরেন্ট',
+        address: 'যাত্রাবাড়ী মোড়, ঢাকা',
+        distance: '০.৭ কিমি',
+        phone: '০১৭০০০০০০০০',
+        photoUrl: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80&w=700',
+        tags: ['মুসলিম মালিকানাধীন', 'হালাল প্রত্যয়িত'],
+        desc: 'উন্নত মানের হালাল প্রক্রিয়ায় প্রস্তুতকৃত তাজা কাবাব, বিরিয়ানি ও দেশীয় খাবার।'
+    },
+    {
+        id: 'bengal_meat',
+        category: 'meat',
+        name: 'বেঙ্গল মিট আউটলেট',
+        address: 'শনির আখড়া, যাত্রাবাড়ী, ঢাকা',
+        distance: '১.১ কিমি',
+        phone: '০৯৬০৬৬৬৬৬৬৬',
+        photoUrl: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&q=80&w=700',
+        tags: ['১০০% জবেহকৃত হালাল গোশত', 'হাইজিন মানসম্মত'],
+        desc: 'শরীয়তসম্মত উপায়ে জবাইকৃত গরু, খাসি ও মুরগির তাজা মাংস।'
+    },
+    {
+        id: 'islamic_books',
+        category: 'books',
+        name: 'মাকতাবাতুল আশরাফ লাইব্রেরি',
+        address: 'মাদ্রাসা রোড, যাত্রাবাড়ী, ঢাকা',
+        distance: '০.৫ কিমি',
+        phone: '০১৮১০০০০০০০',
+        photoUrl: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&q=80&w=700',
+        tags: ['সহিহ ইসলামিক কিতাব', 'তাফসির ও হাদিস'],
+        desc: 'সহিহ বুখারি, মুসলিম, তাফসিরে ইবনে কাসির ও প্রামাণ্য ইসলামিক গ্রন্থ সম্ভার।'
+    },
+    {
+        id: 'sunnah_clothing',
+        category: 'clothing',
+        name: 'আল-বারাকা জুব্বা ও আতর ঘর',
+        address: 'দনিয়া বাজার, ঢাকা',
+        distance: '০.৬ কিমি',
+        phone: '০১৯১০০০০০০০',
+        photoUrl: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&q=80&w=700',
+        tags: ['সুন্নতি পোশাক', 'খাঁটি আতর ও টুপি'],
+        desc: 'উচ্চমানের সুতি কাপড়ের জুব্বা, পায়জামা, জায়নামাজ এবং সৌদি আরবের খাঁটি নন-অ্যালকোহলিক আতর।'
+    }
+];
+
+function renderBazaarList(filterText = '', category = null) {
+    const container = document.getElementById('bazaar-list-container');
+    if (!container) return;
+
+    const query = filterText.toLowerCase().trim();
+    const list = BAZAAR_LISTINGS.filter(item => {
+        const matchesQuery = !query || item.name.toLowerCase().includes(query) || item.address.toLowerCase().includes(query) || item.desc.toLowerCase().includes(query);
+        const matchesCategory = !category || item.category === category;
+        return matchesQuery && matchesCategory;
+    });
+
+    let html = '';
+    list.forEach(item => {
+        html += `
+            <div class="card bazaar-card mt-10" onclick="openBazaarDetail('${item.id}')">
+                <img src="${item.photoUrl}" alt="${item.name}" class="mosque-thumbnail" style="width:65px; height:65px;" loading="lazy">
+                <div class="bazaar-info" style="flex:1;">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <h4>${item.name}</h4>
+                        <span class="zamat-pill">${item.distance}</span>
+                    </div>
+                    <p class="text-secondary small-text mt-5"><i class="fa-solid fa-location-dot" style="color:var(--emerald);"></i> ${item.address}</p>
+                    <span class="tag mt-5"><i class="fa-solid fa-check-circle" style="color:var(--emerald);"></i> ${item.tags[0]}</span>
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html || `<p class="text-center text-secondary small-text mt-20">কোনো প্রতিষ্ঠান পাওয়া যায়নি</p>`;
+}
+
+function filterBazaar(text) {
+    renderBazaarList(text);
+}
+
+function filterBazaarCategory(cat) {
+    renderBazaarList('', cat);
+}
+
+function openBazaarDetail(bizId) {
+    const item = BAZAAR_LISTINGS.find(b => b.id === bizId) || BAZAAR_LISTINGS[0];
+    const cover = document.getElementById('detail-biz-cover');
+    const card = document.getElementById('detail-biz-card');
+
+    if (cover) {
+        cover.style.background = `linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.5)), url('${item.photoUrl}') center/cover no-repeat`;
+    }
+
+    if (card) {
+        card.innerHTML = `
+            <h2>${item.name}</h2>
+            <p class="text-secondary">${item.address} • ${item.distance}</p>
+            <div class="halal-status mt-10">
+                <i class="fa-solid fa-shield-halal" style="color:var(--emerald); font-size:24px;"></i>
+                <div>
+                    <strong>${item.tags[0]}</strong>
+                    <p class="small-text">${item.desc}</p>
+                </div>
+            </div>
+            <div class="action-buttons mt-15" style="display:flex; gap:10px;">
+                <button class="btn btn-outline" style="flex:1;" onclick="alert('যোগাযোগ নম্বর: ${item.phone}')"><i class="fa-solid fa-phone"></i> কল করুন</button>
+                <button class="btn btn-primary" style="flex:1;" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name + ' ' + item.address)}', '_blank')"><i class="fa-solid fa-directions"></i> মানচিত্র</button>
+            </div>
+        `;
+    }
+
+    navTo('screen-biz-detail');
+}
+
 // App Initialization
 document.addEventListener('DOMContentLoaded', () => {
     loadSavedPreferences();
@@ -1283,6 +1605,11 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchRealPrayerTimes();
         fetchNearbyMosques();
     });
+
+    renderDuasList();
+    renderBazaarList();
+    openSpecialDay('shab_e_barat');
+    openNaflDetail('ishraq');
 
     applyTranslations();
 });

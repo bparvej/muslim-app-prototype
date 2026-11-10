@@ -258,7 +258,22 @@
                         </div>
                     </div>
 
-                    <button class="btn btn-outline w-100 mt-20" onclick="alert('সাপ্তাহিক ও মাসিক সময়সূচী শীঘ্রই সংযুক্ত করা হচ্ছে!')" data-i18n="weeklySchedule">সাপ্তাহিক সময়সূচি</button>
+                    <!-- Weekly Prayer Times Modal -->
+                    <div id="weekly-modal-backdrop" class="alarm-modal-backdrop" onclick="closeWeeklyModal(event)">
+                        <div class="alarm-modal" onclick="event.stopPropagation()">
+                            <div class="modal-header">
+                                <h3><i class="fa-solid fa-calendar-week" style="color:var(--emerald); margin-right:8px;"></i> সাপ্তাহিক নামাজের সময়সূচি</h3>
+                                <i class="fa-solid fa-xmark modal-close-btn" onclick="closeWeeklyModal()"></i>
+                            </div>
+                            <p class="small-text text-secondary mb-15">ঢাকা ও পার্শ্ববর্তী এলাকার আগামী ৭ দিনের সময়সূচি (ইসলামিক ফাউন্ডেশন / করাচি মানদণ্ড):</p>
+                            <div id="weekly-table-container">
+                                <!-- Populated dynamically -->
+                            </div>
+                            <button class="btn btn-primary w-100 mt-15" onclick="closeWeeklyModal()">ঠিক আছে</button>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-outline w-100 mt-20" onclick="openWeeklyModal()" data-i18n="weeklySchedule">সাপ্তাহিক সময়সূচি</button>
                     <p class="small-text text-center mt-10" data-i18n="calcMethod">গণনা পদ্ধতি: ইসলামিক ফাউন্ডেশন বাংলাদেশ / করাচি বিশ্ববিদ্যালয়</p>
                 </div>
             </div>
@@ -342,11 +357,11 @@
                     </div>
 
                     <div class="special-list">
-                        <div class="special-item" onclick="navTo('screen-special-day')"><span>শবে বরাত</span><span>১৫ শাবান</span></div>
-                        <div class="special-item" onclick="navTo('screen-special-day')"><span>পবিত্র শবে কদর</span><span>শেষ দশক (রমজান)</span></div>
-                        <div class="special-item" onclick="navTo('screen-special-day')"><span>জুমার দিন</span><span>সাপ্তাহিক শ্রেষ্ঠ দিন</span></div>
-                        <div class="special-item" onclick="navTo('screen-special-day')"><span>পবিত্র আশুরা</span><span>১০ মহররম</span></div>
-                        <div class="special-item" onclick="navTo('screen-special-day')"><span>আরাফার দিন</span><span>৯ জিলহজ</span></div>
+                        <div class="special-item" onclick="openSpecialDay('shab_e_barat')"><span>শবে বরাত</span><span>১৫ শাবান</span></div>
+                        <div class="special-item" onclick="openSpecialDay('shab_e_qadr')"><span>পবিত্র শবে কদর</span><span>শেষ দশক (রমজান)</span></div>
+                        <div class="special-item" onclick="openSpecialDay('juma')"><span>জুমার দিন</span><span>সাপ্তাহিক শ্রেষ্ঠ দিন</span></div>
+                        <div class="special-item" onclick="openSpecialDay('ashura')"><span>পবিত্র আশুরা</span><span>১০ মহররম</span></div>
+                        <div class="special-item" onclick="openSpecialDay('arafa')"><span>আরাফার দিন</span><span>৯ জিলহজ</span></div>
                     </div>
                 </div>
             </div>
@@ -355,20 +370,12 @@
             <div id="screen-special-day" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-calendar')"></i>
-                    <h2>পবিত্র দিন ও রজনী</h2>
+                    <h2 id="special-day-header">পবিত্র দিন ও রজনী</h2>
                     <i class="fa-solid fa-star-and-crescent"></i>
                 </div>
                 <div class="content-scroll">
-                    <div class="card detail-card">
-                        <p class="small-text text-secondary">গুরুত্ব ও ফজিলত</p>
-                        <h3>ইসলামিক বিশেষ দিনসমূহ</h3>
-                        <p>আল্লাহ তা'আলার সন্তুষ্টি ও মাগফিরাত কামনায় বিশেষ রাত এবং দিনগুলোতে অতিরিক্ত নফল ইবাদত, কুরআন তিলাওয়াত ও দান-সদকার গুরুত্ব রয়েছে।</p>
-                        <div class="info-list">
-                            <div><strong>আমল:</strong> অধিক পরিমাণে ইস্তিগফার ও দরুদ শরীফ পাঠ</div>
-                            <div><strong>করণীয়:</strong> নিয়মিত ফরজ নামাজের পর নফল নামাজ ও দোয়া</div>
-                            <div><strong>বর্জনীয়:</strong> শরীয়তবিরোধী বিদআত বা অপ্রমাণিত প্রথা পরিহার করা</div>
-                            <div><strong>দোয়া:</strong> "রাব্বানা আতিনা ফিদ-দুনিয়া হাসানাতাও ওয়া ফিল-আখিরাতি হাসানাহ"</div>
-                        </div>
+                    <div class="card detail-card" id="special-day-content">
+                        <!-- Populated dynamically based on selected day -->
                     </div>
                 </div>
             </div>
@@ -382,12 +389,12 @@
                 </div>
                 <div class="content-scroll">
                     <div class="list-card">
-                        <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>ইশরাক সালাত</span><span>দেখুন</span></div>
-                        <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>চাশত / সালাত উদ-দুহা</span><span>দেখুন</span></div>
-                        <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>তাহাজ্জুদ সালাত</span><span>দেখুন</span></div>
-                        <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>তাহিয়াতুল ওযু</span><span>দেখুন</span></div>
-                        <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>তাহিয়াতুল মসজিদ</span><span>দেখুন</span></div>
-                        <div class="list-item clickable" onclick="navTo('screen-nafl-detail')"><span>সালাতুত তাসবিহ</span><span>দেখুন</span></div>
+                        <div class="list-item clickable" onclick="openNaflDetail('ishraq')"><span>ইশরাক সালাত</span><span>দেখুন</span></div>
+                        <div class="list-item clickable" onclick="openNaflDetail('chasht')"><span>চাশত / সালাত উদ-দুহা</span><span>দেখুন</span></div>
+                        <div class="list-item clickable" onclick="openNaflDetail('tahajjud')"><span>তাহাজ্জুদ সালাত</span><span>দেখুন</span></div>
+                        <div class="list-item clickable" onclick="openNaflDetail('wudu')"><span>তাহিয়াতুল ওযু</span><span>দেখুন</span></div>
+                        <div class="list-item clickable" onclick="openNaflDetail('masjid')"><span>তাহিয়াতুল মসজিদ</span><span>দেখুন</span></div>
+                        <div class="list-item clickable" onclick="openNaflDetail('tasbih')"><span>সালাতুত তাসবিহ</span><span>দেখুন</span></div>
                     </div>
                 </div>
             </div>
@@ -396,20 +403,12 @@
             <div id="screen-nafl-detail" class="screen bg-ivory has-bottom-nav">
                 <div class="top-nav">
                     <i class="fa-solid fa-arrow-left" onclick="navTo('screen-nafl')"></i>
-                    <h2>ইশরাক সালাত</h2>
-                    <i class="fa-solid fa-sun"></i>
+                    <h2 id="nafl-detail-header">নফল নামায</h2>
+                    <i class="fa-solid fa-person-praying"></i>
                 </div>
                 <div class="content-scroll">
-                    <div class="card detail-card">
-                        <p class="small-text text-secondary">নফল নামাজের বিবরণ</p>
-                        <h3>ইশরাকের ফজিলত ও নিয়ম</h3>
-                        <p>সূর্যোদয়ের ১৫-২০ মিনিট পর এই নামাজ আদায় করা সুন্নত/মুস্তাহাব। এতে পূর্ণ একটি হজ ও উমরার সাওয়াবের সুসংবাদ রয়েছে হাদিস শরিফে।</p>
-                        <div class="info-list">
-                            <div><strong>সময়:</strong> সূর্যোদয়ের আনুমানিক ১৫-২০ মিনিট পর</div>
-                            <div><strong>রাকাত সংখ্যা:</strong> ২ থেকে ৪ রাকাত</div>
-                            <div><strong>নিয়ত:</strong> দুই রাকাত ইশরাকের নফল নামাজের নিয়ত করলাম</div>
-                            <div><strong>ফজিলত:</strong> তিরমিজি শরিফের হাদিসে মকবুল হজ ও ওমরার সমতুল্য সওয়াবের কথা এসেছে</div>
-                        </div>
+                    <div class="card detail-card" id="nafl-detail-content">
+                        <!-- Populated dynamically based on selected nafl prayer -->
                     </div>
                 </div>
             </div>
@@ -631,48 +630,31 @@
                 <div class="content-scroll">
                     <div class="search-bar">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" placeholder="খাবার, বই, পোশাক খুঁজুন...">
+                        <input type="text" id="bazaar-search-input" placeholder="খাবার, বই, পোশাক খুঁজুন..." oninput="filterBazaar(this.value)">
                     </div>
 
                     <div class="category-grid mt-20">
-                        <div class="cat-item"><div class="cat-icon"><i class="fa-solid fa-utensils"></i></div><span>রেস্তোরাঁ</span></div>
-                        <div class="cat-item"><div class="cat-icon"><i class="fa-solid fa-drumstick-bite"></i></div><span>গোশত</span></div>
-                        <div class="cat-item"><div class="cat-icon"><i class="fa-solid fa-shirt"></i></div><span>পোশাক</span></div>
-                        <div class="cat-item"><div class="cat-icon"><i class="fa-solid fa-book"></i></div><span>বই</span></div>
+                        <div class="cat-item" onclick="filterBazaarCategory('restaurant')"><div class="cat-icon"><i class="fa-solid fa-utensils"></i></div><span>রেস্তোরাঁ</span></div>
+                        <div class="cat-item" onclick="filterBazaarCategory('meat')"><div class="cat-icon"><i class="fa-solid fa-drumstick-bite"></i></div><span>গোশত</span></div>
+                        <div class="cat-item" onclick="filterBazaarCategory('clothing')"><div class="cat-icon"><i class="fa-solid fa-shirt"></i></div><span>পোশাক</span></div>
+                        <div class="cat-item" onclick="filterBazaarCategory('books')"><div class="cat-icon"><i class="fa-solid fa-book"></i></div><span>বই</span></div>
                     </div>
 
                     <h3 class="section-title">কাছের বিশ্বস্ত স্থান</h3>
-                    <div class="card bazaar-card" onclick="navTo('screen-biz-detail')">
-                        <div class="bazaar-img"></div>
-                        <div class="bazaar-info">
-                            <h4>স্টার কাবাব & রেস্টুরেন্ট</h4>
-                            <p class="text-secondary small-text">যাত্রাবাড়ী মোড় • ০.৭ কিমি</p>
-                            <span class="tag mt-5"><i class="fa-solid fa-check-circle" style="color:var(--emerald);"></i> হালাল প্রত্যয়িত</span>
-                        </div>
+                    <div id="bazaar-list-container">
+                        <!-- Populated dynamically -->
                     </div>
                 </div>
             </div>
 
             <!-- Business Detail Screen -->
             <div id="screen-biz-detail" class="screen bg-ivory has-bottom-nav">
-                <div class="cover-img biz-cover">
+                <div class="cover-img biz-cover" id="detail-biz-cover">
                     <div class="back-btn-overlay" onclick="navTo('screen-bazaar')"><i class="fa-solid fa-arrow-left"></i></div>
                 </div>
                 <div class="content-scroll overlap-content">
-                    <div class="card header-card">
-                        <h2>স্টার কাবাব & রেস্টুরেন্ট</h2>
-                        <p class="text-secondary">যাত্রাবাড়ী, ঢাকা • ০.৭ কিমি</p>
-                        <div class="halal-status mt-10">
-                            <i class="fa-solid fa-shield-halal" style="color:var(--emerald); font-size:24px;"></i>
-                            <div>
-                                <strong>হালাল খাবার নিশ্চিত</strong>
-                                <p class="small-text">মুসলিম মালিকানাধীন এবং শতভাগ হালাল প্রক্রিয়ায় প্রস্তুতকৃত।</p>
-                            </div>
-                        </div>
-                        <div class="action-buttons mt-10">
-                            <button class="btn btn-outline" style="flex:1;"><i class="fa-solid fa-phone"></i> কল করুন</button>
-                            <button class="btn btn-primary" style="flex:1;"><i class="fa-solid fa-directions"></i> মানচিত্র</button>
-                        </div>
+                    <div class="card header-card" id="detail-biz-card">
+                        <!-- Populated dynamically -->
                     </div>
                 </div>
             </div>
