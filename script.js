@@ -1249,7 +1249,7 @@ const NAFL_PRAYER_DATA = {
     }
 };
 
-function openSpecialDay(key) {
+function openSpecialDay(key, shouldNavigate = true) {
     const data = SPECIAL_DAYS_DATA[key] || SPECIAL_DAYS_DATA['shab_e_barat'];
     const header = document.getElementById('special-day-header');
     const content = document.getElementById('special-day-content');
@@ -1268,10 +1268,12 @@ function openSpecialDay(key) {
             </div>
         `;
     }
-    navTo('screen-special-day');
+    if (shouldNavigate) {
+        navTo('screen-special-day');
+    }
 }
 
-function openNaflDetail(key) {
+function openNaflDetail(key, shouldNavigate = true) {
     const data = NAFL_PRAYER_DATA[key] || NAFL_PRAYER_DATA['ishraq'];
     const header = document.getElementById('nafl-detail-header');
     const content = document.getElementById('nafl-detail-content');
@@ -1288,7 +1290,9 @@ function openNaflDetail(key) {
             </div>
         `;
     }
-    navTo('screen-nafl-detail');
+    if (shouldNavigate) {
+        navTo('screen-nafl-detail');
+    }
 }
 
 // Masnoon Dua Library with Arabic, Bengali Pronunciation, and Bengali Translation
@@ -1608,8 +1612,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderDuasList();
     renderBazaarList();
-    openSpecialDay('shab_e_barat');
-    openNaflDetail('ishraq');
+    openSpecialDay('shab_e_barat', false);
+    openNaflDetail('ishraq', false);
 
     applyTranslations();
 });
